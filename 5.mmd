@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Services as Domain Services
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+    participant UAO as Usage Analytics & Operational Insights
+    participant S3 as S3 Projections
+    participant Athena as Athena
+    participant QS as QuickSight
+    participant Leadership as IA Leadership
+
+    Services->>EB: Emit Telemetry Events (e.g., TimeSpent, Revisions)
+    EB->>GAL: Stream to Audit Trail
+    GAL->>S3: Project Events to Optimized Store (Aggregations)
+    UAO->>Athena: Query Projections (e.g., Bottlenecks by Section)
+    Athena-->>UAO: Return Aggregated Metrics (e.g., Avg Time per Stage)
+    UAO->>QS: Update Dashboards (KPIs: Rework Cycles, AI Adoption)
+    QS-->>Leadership: View Insights (e.g., Methodology Effectiveness)

@@ -1,0 +1,128 @@
+graph TD
+    subgraph "Users"
+        Auditors["Auditors / Reviewers"]
+        Managers["IA Managers / Leadership"]
+    end
+
+    subgraph "Frontend"
+        UI["Browser-Based UI\n- Template-Driven Authoring\n- Parallel Editing (Confluence-style)\n- Threaded Comments & Reviews\n- Version Comparison (Diffs)\n- Notifications"]
+    end
+
+    Auditors -->|Interact via Browser| UI
+    Managers -->|Interact via Browser| UI
+
+    subgraph "AWS Network & Security"
+        VPC[VPC]
+        IGW[Internet Gateway]
+        SG[Security Groups]
+        NACL[Network ACLs]
+        WAF[WAF for API Protection]
+    end
+
+    UI -->|"HTTPS Traffic"| APIGW["API Gateway\n- REST APIs\n- Authentication\n- Rate Limiting"]
+
+    subgraph "Core Platform Services (EKS Cluster)"
+        APIGW -->|"Route & Authorize"| Services
+
+        subgraph "Domains as Microservices (Pods in EKS)"
+            TMG["Template & Methodology Governance\n- Manage ~100 Templates (~13 Types)\n- Schemas, Presentation Models, Layouts\n- Lifecycle: Draft->Reviewed->Approved->Published\n- Methodology Rules: Mandatory Fields, Validations\n- Context Taxonomy: businessProcess, activity, subActivity\n- Mappings to Templates\n(Containers, DynamoDB for Storage)"]
+            WAL["Workpaper Authoring & Lifecycle\n- Create from Templates (workpaperId, templateType)\n- Store Structured Fields, Narratives\n- Context: auditEngagementId, businessProcess etc.\n- State Machine: Draft->In Review->Rework->Approved->Finalized\n- Immutable Versions on Save\n- Generate Exports (PDF/Word) with Hashes\n(Containers, DynamoDB for Content)"]
+            CR["Collaboration & Review\n- Threaded Comments Anchored to Fields/Sections\n- Review Assignments & Workflows\n- Notifications (Email/In-App) for Mentions, Changes\n- Presence Indicators for Parallel Editing\n(Containers, DynamoDB for Metadata)"]
+            IAA["Intelligent Assistance & Automation\n- AI Orchestration Service\n- Generative: Drafting, Summarizing, Gap Checks\n- Agentic: Evidence Assembly, Pre-Populate, Test Plans\n- Human-in-the-Loop: Suggestions Only\n- Log Prompts/Outputs to Audit Trail\n- Data Masking/Minimization\n- Integrate with GS-AI (Lambda Triggers)\n(Containers, Lambda for AI Invocations)"]
+            GAL["Governance, Audit Trail & Lineage\n- Append-Only Event Store (All Actions: Edits, AI, Exports)\n- Tamper-Evident Logs\n- Data Lineage: Sources to Workpapers to Exports\n- Cryptographic Hashes for Integrity Verification\n- Retention & Access Governance\n- Historical Reconstruction APIs\n(Containers, Kinesis for Events, S3 Archive)"]
+            UAO["Usage Analytics & Operational Insights\n- Collect Telemetry/Events\n- Compute KPIs: Time per Stage, Revisions, AI Impact\n- Segments by Context Dimensions\n- Dashboards for Bottlenecks, Adoption\n- Entitlement-Aware (No Micro-Surveillance)\n(Containers, Athena Queries, QuickSight Viz)"]
+            PCS["Platform & Cross-Cutting Services\n- IAM: Cognito SSO, RBAC/ABAC\n- Security: KMS Encryption, Secrets Mgr\n- Infra: EKS Scaling, Backup/Restore\n- Observability: CloudWatch Logs/Metrics/Alarms\n- Integration: API GW, EventBridge, SQS\n- Data Storage Patterns: Regional Isolation\n(Shared Across Domains)"]
+        end
+    end
+
+    TMG -->|"Provide Schemas/Rules"| WAL
+    WAL -->|"Trigger Collaboration"| CR
+    CR -->|"Emit Comments/Reviews"| GAL
+    WAL -->|"Request AI Assistance"| IAA
+    IAA -->|"Log Interactions"| GAL
+    Services[All Domains] -->|"Emit Domain Events"| EB["EventBridge\n- Event Bus\n- Trigger Workflows\n- Notifications\n- Integration Events"]
+    EB -->|"Route to Domains"| Services
+    EB -->|"Stream Audit Events"| GAL
+    UAO -->|"Consume Projections"| GAL
+
+    WAL -->|"Store Workpapers/Versions"| DB["DynamoDB\n- Structured Data\n- Versions\n- Metadata\n- Schemas"]
+    TMG -->|"Store Templates"| DB
+    CR -->|"Store Comments"| DB
+    GAL -->|"Append Events"| KDS["Kinesis Data Streams\n- Audit Trail Events\n- Lineage Records"]
+    KDS -->|"Long-Term Archive"| S3["S3 Buckets\n- Immutable Exports (PDFs w/ Hashes)\n- Logs\n- Projections for Analytics"]
+    UAO -->|"Query S3 Data"| Athena["Athena\n- SQL Queries on Projections\n- Metrics Aggregation"]
+    Athena -->|"Visualize KPIs"| QS["QuickSight\n- Dashboards\n- Reports for Leadership"]
+
+    IAA -->|"Invoke AI (Governed)"| GSAI["Internal GS-AI Platform\n- Enterprise Models\n- No Data Retention/Training\n- API via Lambda/Gateway"]
+    GSAI -->|"Return Suggestions (Logged)"| IAA
+
+    subgraph "External Integrations"
+        AB["AuditBoard/APEX\n- Audit Planning/Scheduling\n- Issue Lifecycle\n- Final Archival"]
+        GRC["GRC Platforms\n- Governance, Risk, Compliance\n- Issue Management"]
+        DL["Data Lake\n- Source Evidence\n- Authoritative Data"]
+        HCM["HCM Systems\n- User/Employee Data"]
+        SIMPL["SIMPL\n- Other Audit Tools"]
+    end
+
+    Services -->|"Exports: PDFs, Structured Data"| INT["Integration Layer\n- API Gateway for Sync APIs\n- EventBridge for Async Events\n- SQS Queues for Reliability\n- Idempotent Processing"]
+    INT -->|"Push Final Artifacts"| AB
+    INT -->|"Push Findings/Status"| GRC
+    INT -->|"Pull Evidence/Data"| DL
+    INT -->|"Sync Users/Roles"| HCM
+    INT -->|"Other Data Exchange"| SIMPL
+
+    PCS -->|"Monitor All"| CW["CloudWatch\n- Logs\n- Metrics\n- Alarms\n- Tracing"]
+    PCS -->|"Authenticate/Authorize"| Cognito["Cognito\n- SSO Integration\n- Role-Based Access\n- Attribute-Based Control"]
+    PCS -->|"Encrypt/Manage Keys"| KMS["KMS\n- Data Encryption\n- Secrets Management"]
+    PCS -->|"Backup & Recovery"| Backup["AWS Backup\n- RTO/RPO Compliance\n- Snapshot Management"]
+
+    subgraph "Infrastructure"
+        EKS["EKS Cluster\n- Kubernetes Orchestration\n- Auto-Scaling Pods\n- Containerized Microservices\n- On-Prem/AWS Hybrid Support"]
+        EKS -->|"Host & Scale"| Services
+    end
+
+    VPC --> IGW
+    VPC -->|"Secure Enclosure"| EKS
+    VPC -->|"Enclose Resources"| DB
+    VPC -->|"Enclose Resources"| S3
+    VPC -->|"Enclose Resources"| EB
+    VPC -->|"Enclose Resources"| APIGW
+    VPC -->|"Enclose Resources"| KDS
+    VPC -->|"Enclose Resources"| Athena
+    VPC -->|"Enclose Resources"| QS
+    VPC -->|"Enclose Resources"| CW
+    VPC -->|"Enclose Resources"| Cognito
+    VPC -->|"Enclose Resources"| KMS
+    APIGW --> WAF
+
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+    style UI fill:#bbf,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style Backup fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style WAF fill:#ffb,stroke:#333

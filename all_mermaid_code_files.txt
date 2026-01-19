@@ -1,0 +1,1404 @@
+==> Diagram 1 ==
+sequenceDiagram
+    participant Auditor as Auditor (User)
+    participant UI as Browser UI
+    participant TMG as Template & Methodology Governance
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor->>UI: Select Template Type
+    UI->>TMG: Request Latest Template Schema (via API)
+    TMG->>DB: Fetch Schema, Rules, Taxonomy
+    DB-->>TMG: Return Schema Data
+    TMG-->>UI: Provide Schema & Presentation Model
+    UI->>WAL: Create New Workpaper (workpaperId, templateType, context: auditEngagementId, businessProcess)
+    WAL->>DB: Store Initial Structured Content & Metadata (State: Draft)
+    DB-->>WAL: Confirm Storage
+    WAL->>EB: Emit Event (WorkpaperCreated)
+    EB->>GAL: Log Audit Event
+    GAL->>KDS: Append Immutable Event
+    WAL-->>UI: Return workpaperId & Initial View
+    UI-->>Auditor: Display Editable Workpaper
+================
+
+==> Diagram 2 ==
+sequenceDiagram
+    participant Auditor1 as Auditor 1
+    participant Auditor2 as Auditor 2
+    participant UI as Browser UI
+    participant CR as Collaboration & Review
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor1->>UI: Edit Section/Field (Parallel Editing)
+    UI->>WAL: Save Changes (workpaperId, updates)
+    WAL->>DB: Create New Immutable Version
+    DB-->>WAL: Confirm Version
+    WAL->>EB: Emit Event (VersionUpdated)
+    EB->>GAL: Log Edit Event (Who, What, When)
+    EB->>CR: Trigger Presence Update
+    CR-->>UI: Update Presence Indicators (Auditor2 sees Auditor1 editing)
+    Auditor1->>UI: Add Threaded Comment (Anchored to Field)
+    UI->>CR: Post Comment (workpaperId, section, text)
+    CR->>DB: Store Comment Metadata
+    DB-->>CR: Confirm
+    CR->>EB: Emit Event (CommentAdded)
+    EB->>GAL: Log Comment Event
+    EB->>UI: Notify Auditor2 (In-App/Email for Mention)
+    Auditor2->>UI: Review & Respond to Comment
+    UI->>CR: Update Comment (Resolve/Reject)
+    CR->>EB: Emit Event (CommentResolved)
+    EB->>GAL: Log Resolution
+
+================
+
+==> Diagram 3 ==
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation
+    participant GSAI as GS-AI Platform
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+
+    Auditor->>UI: Request AI Assistance (e.g., Draft Section, Summarize)
+    UI->>IAA: Invoke Orchestration (workpaperId, context, inputs, masked data)
+    IAA->>GAL: Log Prompt & Metadata (Before Invocation)
+    IAA->>GSAI: Call Governed Model (Enterprise API, No Retention)
+    GSAI-->>IAA: Return Suggestion (e.g., Draft Text)
+    IAA->>GAL: Log Output & Model Details
+    IAA-->>UI: Present Suggestion (Human-in-the-Loop)
+    Auditor->>UI: Review/Edit/Accept Suggestion
+    UI->>WAL: Save Accepted Changes as New Version
+    WAL->>EB: Emit Event (AIAssistedUpdate)
+    EB->>GAL: Log Full AI Interaction Event
+
+================
+
+==> Diagram 4 ==
+sequenceDiagram
+    participant Manager as IA Manager
+    participant UI as Browser UI
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant CR as Collaboration & Review
+    participant INT as Integration Layer
+    participant AB as AuditBoard/APEX
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+
+    Manager->>UI: Initiate Review (Assign Reviewer)
+    UI->>CR: Assign Review (workpaperId, reviewer)
+    CR->>EB: Emit Event (ReviewAssigned)
+    EB->>GAL: Log Assignment
+    Reviewer->>UI: Provide Feedback/Approve
+    UI->>CR: Update Review State (e.g., Approved)
+    CR->>WAL: Transition Lifecycle (to Finalized)
+    WAL->>EB: Emit Event (StateChanged: Finalized)
+    EB->>GAL: Log State Change
+    WAL->>INT: Generate Export (PDF/Word with Hash)
+    INT->>AB: Push Immutable Artifact & Structured Data (API/Event)
+    AB-->>INT: Confirm Receipt
+    INT->>GAL: Log Export Event with Hash
+    GAL->>KDS: Append Integrity Record
+
+================
+
+==> Diagram 5 ==
+sequenceDiagram
+    participant Services as Domain Services
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+    participant UAO as Usage Analytics & Operational Insights
+    participant S3 as S3 Projections
+    participant Athena as Athena
+    participant QS as QuickSight
+    participant Leadership as IA Leadership
+
+    Services->>EB: Emit Telemetry Events (e.g., TimeSpent, Revisions)
+    EB->>GAL: Stream to Audit Trail
+    GAL->>S3: Project Events to Optimized Store (Aggregations)
+    UAO->>Athena: Query Projections (e.g., Bottlenecks by Section)
+    Athena-->>UAO: Return Aggregated Metrics (e.g., Avg Time per Stage)
+    UAO->>QS: Update Dashboards (KPIs: Rework Cycles, AI Adoption)
+    QS-->>Leadership: View Insights (e.g., Methodology Effectiveness)
+
+================
+
+==> Diagram 6 ==
+graph TD
+    subgraph "Users"
+        Auditors["Auditors / Reviewers"]
+        Managers["IA Managers / Leadership"]
+    end
+
+    subgraph "Frontend"
+        UI["Browser-Based UI\n- Template-Driven Authoring\n- Parallel Editing (Confluence-style)\n- Threaded Comments & Reviews\n- Version Comparison (Diffs)\n- Notifications"]
+    end
+
+    Auditors -->|Interact via Browser| UI
+    Managers -->|Interact via Browser| UI
+
+    subgraph "AWS Network & Security"
+        VPC[VPC]
+        IGW[Internet Gateway]
+        SG[Security Groups]
+        NACL[Network ACLs]
+        WAF[WAF for API Protection]
+    end
+
+    UI -->|"HTTPS Traffic"| APIGW["API Gateway\n- REST APIs\n- Authentication\n- Rate Limiting"]
+
+    subgraph "Core Platform Services (EKS Cluster)"
+        APIGW -->|"Route & Authorize"| Services
+
+        subgraph "Domains as Microservices (Pods in EKS)"
+            TMG["Template & Methodology Governance\n- Manage ~100 Templates (~13 Types)\n- Schemas, Presentation Models, Layouts\n- Lifecycle: Draft->Reviewed->Approved->Published\n- Methodology Rules: Mandatory Fields, Validations\n- Context Taxonomy: businessProcess, activity, subActivity\n- Mappings to Templates\n(Containers, DynamoDB for Storage)"]
+            WAL["Workpaper Authoring & Lifecycle\n- Create from Templates (workpaperId, templateType)\n- Store Structured Fields, Narratives\n- Context: auditEngagementId, businessProcess etc.\n- State Machine: Draft->In Review->Rework->Approved->Finalized\n- Immutable Versions on Save\n- Generate Exports (PDF/Word) with Hashes\n(Containers, DynamoDB for Content)"]
+            CR["Collaboration & Review\n- Threaded Comments Anchored to Fields/Sections\n- Review Assignments & Workflows\n- Notifications (Email/In-App) for Mentions, Changes\n- Presence Indicators for Parallel Editing\n(Containers, DynamoDB for Metadata)"]
+            IAA["Intelligent Assistance & Automation\n- AI Orchestration Service\n- Generative: Drafting, Summarizing, Gap Checks\n- Agentic: Evidence Assembly, Pre-Populate, Test Plans\n- Human-in-the-Loop: Suggestions Only\n- Log Prompts/Outputs to Audit Trail\n- Data Masking/Minimization\n- Integrate with GS-AI (Lambda Triggers)\n(Containers, Lambda for AI Invocations)"]
+            GAL["Governance, Audit Trail & Lineage\n- Append-Only Event Store (All Actions: Edits, AI, Exports)\n- Tamper-Evident Logs\n- Data Lineage: Sources to Workpapers to Exports\n- Cryptographic Hashes for Integrity Verification\n- Retention & Access Governance\n- Historical Reconstruction APIs\n(Containers, Kinesis for Events, S3 Archive)"]
+            UAO["Usage Analytics & Operational Insights\n- Collect Telemetry/Events\n- Compute KPIs: Time per Stage, Revisions, AI Impact\n- Segments by Context Dimensions\n- Dashboards for Bottlenecks, Adoption\n- Entitlement-Aware (No Micro-Surveillance)\n(Containers, Athena Queries, QuickSight Viz)"]
+            PCS["Platform & Cross-Cutting Services\n- IAM: Cognito SSO, RBAC/ABAC\n- Security: KMS Encryption, Secrets Mgr\n- Infra: EKS Scaling, Backup/Restore\n- Observability: CloudWatch Logs/Metrics/Alarms\n- Integration: API GW, EventBridge, SQS\n- Data Storage Patterns: Regional Isolation\n(Shared Across Domains)"]
+        end
+    end
+
+    TMG -->|"Provide Schemas/Rules"| WAL
+    WAL -->|"Trigger Collaboration"| CR
+    CR -->|"Emit Comments/Reviews"| GAL
+    WAL -->|"Request AI Assistance"| IAA
+    IAA -->|"Log Interactions"| GAL
+    Services[All Domains] -->|"Emit Domain Events"| EB["EventBridge\n- Event Bus\n- Trigger Workflows\n- Notifications\n- Integration Events"]
+    EB -->|"Route to Domains"| Services
+    EB -->|"Stream Audit Events"| GAL
+    UAO -->|"Consume Projections"| GAL
+
+    WAL -->|"Store Workpapers/Versions"| DB["DynamoDB\n- Structured Data\n- Versions\n- Metadata\n- Schemas"]
+    TMG -->|"Store Templates"| DB
+    CR -->|"Store Comments"| DB
+    GAL -->|"Append Events"| KDS["Kinesis Data Streams\n- Audit Trail Events\n- Lineage Records"]
+    KDS -->|"Long-Term Archive"| S3["S3 Buckets\n- Immutable Exports (PDFs w/ Hashes)\n- Logs\n- Projections for Analytics"]
+    UAO -->|"Query S3 Data"| Athena["Athena\n- SQL Queries on Projections\n- Metrics Aggregation"]
+    Athena -->|"Visualize KPIs"| QS["QuickSight\n- Dashboards\n- Reports for Leadership"]
+
+    IAA -->|"Invoke AI (Governed)"| GSAI["Internal GS-AI Platform\n- Enterprise Models\n- No Data Retention/Training\n- API via Lambda/Gateway"]
+    GSAI -->|"Return Suggestions (Logged)"| IAA
+
+    subgraph "External Integrations"
+        AB["AuditBoard/APEX\n- Audit Planning/Scheduling\n- Issue Lifecycle\n- Final Archival"]
+        GRC["GRC Platforms\n- Governance, Risk, Compliance\n- Issue Management"]
+        DL["Data Lake\n- Source Evidence\n- Authoritative Data"]
+        HCM["HCM Systems\n- User/Employee Data"]
+        SIMPL["SIMPL\n- Other Audit Tools"]
+    end
+
+    Services -->|"Exports: PDFs, Structured Data"| INT["Integration Layer\n- API Gateway for Sync APIs\n- EventBridge for Async Events\n- SQS Queues for Reliability\n- Idempotent Processing"]
+    INT -->|"Push Final Artifacts"| AB
+    INT -->|"Push Findings/Status"| GRC
+    INT -->|"Pull Evidence/Data"| DL
+    INT -->|"Sync Users/Roles"| HCM
+    INT -->|"Other Data Exchange"| SIMPL
+
+    PCS -->|"Monitor All"| CW["CloudWatch\n- Logs\n- Metrics\n- Alarms\n- Tracing"]
+    PCS -->|"Authenticate/Authorize"| Cognito["Cognito\n- SSO Integration\n- Role-Based Access\n- Attribute-Based Control"]
+    PCS -->|"Encrypt/Manage Keys"| KMS["KMS\n- Data Encryption\n- Secrets Management"]
+    PCS -->|"Backup & Recovery"| Backup["AWS Backup\n- RTO/RPO Compliance\n- Snapshot Management"]
+
+    subgraph "Infrastructure"
+        EKS["EKS Cluster\n- Kubernetes Orchestration\n- Auto-Scaling Pods\n- Containerized Microservices\n- On-Prem/AWS Hybrid Support"]
+        EKS -->|"Host & Scale"| Services
+    end
+
+    VPC --> IGW
+    VPC -->|"Secure Enclosure"| EKS
+    VPC -->|"Enclose Resources"| DB
+    VPC -->|"Enclose Resources"| S3
+    VPC -->|"Enclose Resources"| EB
+    VPC -->|"Enclose Resources"| APIGW
+    VPC -->|"Enclose Resources"| KDS
+    VPC -->|"Enclose Resources"| Athena
+    VPC -->|"Enclose Resources"| QS
+    VPC -->|"Enclose Resources"| CW
+    VPC -->|"Enclose Resources"| Cognito
+    VPC -->|"Enclose Resources"| KMS
+    APIGW --> WAF
+
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+    style UI fill:#bbf,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style Backup fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style WAF fill:#ffb,stroke:#333
+
+================
+
+==> Diagram 7 ==
+graph TB
+    subgraph "AWS Account / Region (e.g., us-west-2)"
+        subgraph "VPC (Virtual Private Cloud)"
+            subgraph "Public Subnets"
+                IGW[Internet Gateway] --> ALB[Application Load Balancer<br>Exposes UI APIs]
+                ALB --> APIGW[API Gateway<br>REST Endpoints, Auth]
+            end
+
+            subgraph "Private Subnets"
+                subgraph "EKS Cluster (Kubernetes)"
+                    ControlPlane[EKS Control Plane<br>Managed by AWS]
+                    WorkerNodes[Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA[AI Orchestration Pod<br>Lambda Integrations for AI Calls]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS[Platform Services Pod]
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB[DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata]
+                KDS[Kinesis Data Streams<br>Append-Only Audit Events]
+                S3[S3 Buckets<br>Immutable Exports, Logs, Projections]
+                Athena[Athena<br>Query Engine for S3]
+                QS[QuickSight<br>BI Dashboards]
+                EB[EventBridge<br>Event Bus & Rules]
+                CW[CloudWatch<br>Logs, Metrics, Alarms]
+                Cognito[Cognito<br>User Pools, Identity]
+                KMS[KMS<br>Key Management]
+
+                EKS --> DB
+                EKS --> KDS
+                EKS --> S3
+                EKS --> Athena
+                EKS --> QS
+                EKS --> EB
+                EKS --> CW
+                EKS --> Cognito
+                EKS --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKS
+            EKS --> NAT
+        end
+
+        subgraph "External Services (Integrated)"
+            GSAI[GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink]
+            AB[AuditBoard/APEX<br>Via API/Events]
+            GRC[GRC Platforms<br>Via API/Events]
+            DL[Data Lake<br>Via S3/API]
+            HCM[HCM Systems<br>Via API]
+            SIMPL[SIMPL<br>Via API]
+        end
+
+        EKS -->|Governed API Calls| GSAI
+        EKS -->|Exports/Events via Integration Layer| AB
+        EKS -->|Push Findings| GRC
+        EKS -->|Pull Evidence| DL
+        EKS -->|User Sync| HCM
+        EKS -->|Data Exchange| SIMPL
+    end
+
+    subgraph "Users (External)"
+        Auditors[Auditors / Reviewers<br>Browser Access]
+        Managers[Managers / Leadership<br>Browser Access]
+    end
+
+    Auditors -->|HTTPS| IGW
+    Managers -->|HTTPS| IGW
+
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style Public Subnets fill:#dfd,stroke:#333
+    style Private Subnets fill:#dfd,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style External Services fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+
+================
+
+==> Diagram 8 ==
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation (Orchestrator)
+    participant GSAI as GS-AI Platform (Internal Models)
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+
+    Auditor->>UI: Request AI Assistance (e.g., Generate Draft, Summarize, Gap Check)
+    UI->>IAA: Invoke AI Orchestration API (workpaperId, context: businessProcess/activity/subActivity, inputs, masked data)
+    IAA->>GAL: Log Pre-Invocation Event (Prompt Metadata, Model Selection, User)
+    IAA->>GSAI: Call Governed Enterprise API (Masked/Prompt, No Retention/Training Policy)
+    GSAI-->>IAA: Return AI Output (Suggestion, Model Metadata)
+    IAA->>GAL: Log Post-Invocation Event (Output, Decisions, Safety Checks)
+    IAA-->>UI: Present Suggestion as Editable Draft (Human Review Required)
+    Auditor->>UI: Review, Edit, Accept/Reject Suggestion
+    alt Accept
+        UI->>WAL: Save Accepted Changes (New Version, AI-Assisted Flag)
+        WAL->>DB: Store Updated Structured Content & Version
+        DB-->>WAL: Confirm
+        WAL->>EB: Emit Event (AIAssistedVersionCreated, Details)
+        EB->>GAL: Append Full AI Interaction Audit Trail
+    else Reject
+        UI->>IAA: Log Rejection (Feedback for Improvement)
+        IAA->>EB: Emit Event (AISuggestionRejected)
+        EB->>GAL: Append Rejection Event
+    end
+    Note over IAA,GAL: All Prompts/Outputs Logged&#59; Human-Review&#59; No Auto-Commit
+
+================
+
+==> Diagram 9 ==
+graph TD
+    subgraph "Cross-Cutting Context"
+        TAX[Context & Taxonomy Model<br>- Dimensions: businessProcess, activity, subActivity, action<br>- Owned by Template Domain<br>- Mappings to Templates]
+    end
+
+    subgraph "Domains as Microservices"
+        TMG["Template & Methodology Governance Domain<br>- Manage Templates (Schemas, Presentation, Layouts)<br>- Lifecycle: Draft->Reviewed->Approved->Published<br>- Methodology Rules & Validations<br>- Taxonomy Ownership"]
+        WAL["Workpaper Authoring & Lifecycle Domain<br>- Create/Edit Workpapers (Structured Fields, Narratives)<br>- Lifecycle States: Draft->In Review->Approved->Finalized<br>- Immutable Versioning<br>- Exports with Hashes"]
+        CR["Collaboration & Review Domain<br>- Threaded Comments & Assignments<br>- Parallel Editing & Presence<br>- Review Workflows & Notifications"]
+        IAA["Intelligent Assistance & Automation Domain<br>- AI Orchestration Service<br>- Generative Assistance (Drafting, Summarizing)<br>- Agentic Workflows (Evidence Assembly, Pre-Populate)<br>- Human-in-the-Loop & Logging"]
+        GAL["Governance, Audit Trail & Lineage Domain<br>- Append-Only Event Store<br>- Tamper-Evident Logs<br>- Data Lineage & Integrity Hashes<br>- Historical Reconstruction"]
+        UAO["Usage Analytics & Operational Insights Domain<br>- Telemetry Collection & KPIs<br>- Dashboards for Bottlenecks & Adoption<br>- Projections from Events"]
+        PCS["Platform & Cross-Cutting Services Domain<br>- IAM, SSO, RBAC/ABAC<br>- Security & Compliance<br>- Infrastructure & Observability<br>- Integration Framework"]
+    end
+
+    TMG -->|Schemas/Rules/Taxonomy| WAL
+    WAL -->|Workpaper Context| CR
+    WAL -->|Assistance Requests| IAA
+    IAA -->|Interactions & Outputs| GAL
+    CR -->|Comments/Reviews| GAL
+    WAL -->|Versions/States| GAL
+    AllDomains[All Domains] -->|Emit Events| EB[EventBridge<br>Central Event Bus]
+    EB -->|Trigger/Notify| AllDomains
+    EB -->|Audit Stream| GAL
+    GAL -->|Projections| UAO
+    UAO -->|Insights| TMG
+    PCS -->|Provides Services To| AllDomains
+    TAX -->|Used By| AllDomains
+
+    subgraph "External Integrations (via PCS/Integration Framework)"
+        EXT[External Systems<br>AuditBoard, APEX, GRC, Data Lake, GS-AI]
+    end
+
+    PCS -->|APIs/Events| EXT
+    IAA -->|Governed Calls| EXT
+
+    style TAX fill:#eee,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style EXT fill:#fdd,stroke:#333
+
+================
+
+==> Diagram 10 ==
+graph TB
+    subgraph "AWS Account / Region (e.g., us-west-2)"
+        subgraph "VPC (Virtual Private Cloud)"
+            subgraph "Public Subnets"
+                IGW[Internet Gateway] --> ALB[Application Load Balancer<br>Exposes UI APIs]
+                ALB --> APIGW[API Gateway<br>REST Endpoints, Auth]
+            end
+
+            subgraph "Private Subnets"
+                subgraph "EKS Cluster (Kubernetes)"
+                    ControlPlane[EKS Control Plane<br>Managed by AWS]
+                    WorkerNodes[Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA[AI Orchestration Pod<br>Lambda Integrations for AI Calls]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS[Platform Services Pod]
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB[DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata]
+                KDS[Kinesis Data Streams<br>Append-Only Audit Events]
+                S3[S3 Buckets<br>Immutable Exports, Logs, Projections]
+                Athena[Athena<br>Query Engine for S3]
+                QS[QuickSight<br>BI Dashboards]
+                EB[EventBridge<br>Event Bus & Rules]
+                CW[CloudWatch<br>Logs, Metrics, Alarms]
+                Cognito[Cognito<br>User Pools, Identity]
+                KMS[KMS<br>Key Management]
+
+                EKS --> DB
+                EKS --> KDS
+                EKS --> S3
+                EKS --> Athena
+                EKS --> QS
+                EKS --> EB
+                EKS --> CW
+                EKS --> Cognito
+                EKS --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKS
+            EKS --> NAT
+        end
+
+        subgraph "External Services (Integrated)"
+            GSAI[GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink]
+            AB[AuditBoard/APEX<br>Via API/Events]
+            GRC[GRC Platforms<br>Via API/Events]
+            DL[Data Lake<br>Via S3/API]
+            HCM[HCM Systems<br>Via API]
+            SIMPL[SIMPL<br>Via API]
+        end
+
+        EKS -->|Governed API Calls| GSAI
+        EKS -->|Exports/Events via Integration Layer| AB
+        EKS -->|Push Findings| GRC
+        EKS -->|Pull Evidence| DL
+        EKS -->|User Sync| HCM
+        EKS -->|Data Exchange| SIMPL
+    end
+
+    subgraph "Users (External)"
+        Auditors[Auditors / Reviewers<br>Browser Access]
+        Managers[Managers / Leadership<br>Browser Access]
+    end
+
+    Auditors -->|HTTPS| IGW
+    Managers -->|HTTPS| IGW
+
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style Public Subnets fill:#dfd,stroke:#333
+    style Private Subnets fill:#dfd,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style External Services fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+
+================
+
+==> Diagram 11 ==
+graph TD
+    subgraph "IA Meridian (Data Flows)"
+        WAL[Workpaper Authoring & Lifecycle<br>Structured Content, Versions, States]
+        IAA[Intelligent Assistance<br>AI Suggestions, Evidence Assembly]
+        GAL[Audit Trail & Lineage<br>Events, Hashes, Lineage Records]
+        UAO[Analytics & Insights<br>Metrics, KPIs from Projections]
+        INT["Integration Layer\nAPIs, Events, Exports (PDF/Word w/ Hashes)"]
+    end
+
+    subgraph "External Systems"
+        DL[Data Lake<br>Authoritative Evidence, Source Data]
+        AB[AuditBoard/APEX<br>Audit Management, Archival, Submissions]
+        GRC[GRC Platforms<br>Issue Management, Findings]
+        HCM[HCM Systems<br>User Data, Roles]
+        SIMPL[SIMPL<br>Audit Tools, Issues]
+        GSAI[GS-AI Platform<br>Governed Models]
+    end
+
+    DL -->|Pull Evidence/Data APIs| IAA
+    IAA -->|Assembled Data Masked| WAL
+    WAL -->|Structured Updates| GAL
+    WAL -->|Finalized Artifacts/Data| INT
+    INT -->|Export PDFs w/ Hashes Immutable| AB
+    INT -->|Push Findings/Status Events/APIs| GRC
+    INT -->|Data Exchange| SIMPL
+    HCM -->|Sync Users/Roles| INT
+    WAL -->|Telemetry/Events| UAO
+    GAL -->|Event Projections| UAO
+    IAA -->|Governed Calls Prompts/Outputs Logged| GSAI
+    GSAI -->|Suggestions| IAA
+    GAL -->|Lineage Links Sources to Exports| INT
+    INT -->|Integrity Verification Hashes| AB
+
+    style WAL fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+
+================
+
+==> Diagram 12 ==
+graph TD
+    subgraph "IA Meridian (Data Flows)"
+        WAL[Workpaper Authoring & Lifecycle<br>Structured Content, Versions, States]
+        IAA[Intelligent Assistance<br>AI Suggestions, Evidence Assembly]
+        GAL[Audit Trail & Lineage<br>Events, Hashes, Lineage Records]
+        UAO[Analytics & Insights<br>Metrics, KPIs from Projections]
+        INT["Integration Layer<br>APIs, Events, Exports (PDF/Word w/ Hashes)"]
+    end
+
+    subgraph "External Systems"
+        DL["Data Lake<br>Authoritative Evidence, Source Data"]
+        AB["AuditBoard/APEX<br>Audit Management, Archival, Submissions"]
+        GRC["GRC Platforms<br>Issue Management, Findings"]
+        HCM["HCM Systems<br>User Data, Roles"]
+        SIMPL["SIMPL<br>Audit Tools, Issues"]
+        GSAI["GS-AI Platform<br>Governed Models"]
+    end
+
+    DL -->|"Pull Evidence/Data (APIs)"| IAA
+    IAA -->|"Assembled Data (Masked)"| WAL
+    WAL -->|Structured Updates| GAL
+    WAL -->|Finalized Artifacts/Data| INT
+    INT -->|"Export PDFs w/ Hashes (Immutable)"| AB
+    INT -->|"Push Findings/Status (Events/APIs)"| GRC
+    INT -->|Data Exchange| SIMPL
+    HCM -->|Sync Users/Roles| INT
+    WAL -->|Telemetry/Events| UAO
+    GAL -->|Event Projections| UAO
+    IAA -->|"Governed Calls (Prompts/Outputs Logged)"| GSAI
+    GSAI -->|Suggestions| IAA
+    GAL -->|"Lineage Links (Sources to Exports)"| INT
+    INT -->|"Integrity Verification (Hashes)"| AB
+
+    style WAL fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+
+================
+
+==> Diagram 13 ==
+sequenceDiagram
+    participant Auditor1 as Auditor 1
+    participant Auditor2 as Auditor 2 (Reviewer)
+    participant UI as Browser UI
+    participant CR as Collaboration & Review Domain
+    participant WAL as Workpaper Authoring & Lifecycle Domain
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+    participant DB as DynamoDB
+
+    Auditor1->>UI: Edit Workpaper Section (Parallel Editing)
+    UI->>WAL: Submit Edits (workpaperId, updates)
+    WAL->>DB: Create New Immutable Version
+    DB-->>WAL: Version Confirmed
+    WAL->>EB: Emit VersionUpdated Event
+    EB->>GAL: Log Edit Event (User, Timestamp, Changes)
+    EB->>CR: Notify for Presence Update
+    CR-->>UI: Show Presence (Auditor2 Sees Auditor1 Editing)
+
+    Auditor1->>UI: Assign Review to Auditor2
+    UI->>CR: Create Review Assignment (workpaperId, reviewer: Auditor2, state: In Review)
+    CR->>DB: Store Assignment Metadata
+    DB-->>CR: Confirmed
+    CR->>EB: Emit ReviewAssigned Event
+    EB->>GAL: Log Assignment Event
+    EB->>UI: Send Notification to Auditor2 (In-App/Email)
+
+    Auditor2->>UI: Add Threaded Comment (Anchored to Section/Field)
+    UI->>CR: Post Comment (workpaperId, section, commentText)
+    CR->>DB: Store Comment
+    DB-->>CR: Confirmed
+    CR->>EB: Emit CommentAdded Event
+    EB->>GAL: Log Comment Event
+    EB->>UI: Notify Auditor1 (Mention/Change)
+
+    Auditor1->>UI: Resolve Comment & Make Changes
+    UI->>CR: Update Comment State (Resolved)
+    CR->>EB: Emit CommentResolved Event
+    EB->>GAL: Log Resolution
+    UI->>WAL: Submit Rework Edits
+    WAL->>DB: Create Rework Version
+    WAL->>EB: Emit ReworkVersionUpdated Event
+    EB->>GAL: Log Rework
+
+    Auditor2->>UI: Approve Workpaper
+    UI->>CR: Update Review State (Approved)
+    CR->>WAL: Transition Lifecycle State (to Approved)
+    WAL->>EB: Emit StateChanged Event (Approved)
+    EB->>GAL: Log Approval
+    EB->>UI: Notify Auditor1 (Approval)
+    Note over CR,GAL: All Interactions Logged&#59; Supports Reconstruction & QA
+
+================
+
+==> Diagram 14 ==
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation (Orchestrator)
+    participant GSAI as GS-AI Platform (Internal Models)
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+
+    Auditor->>UI: Request AI Assistance (e.g., Generate Draft, Summarize, Gap Check)
+    UI->>IAA: Invoke AI Orchestration API (workpaperId, context: businessProcess/activity/subActivity, inputs, masked data)
+    IAA->>GAL: Log Pre-Invocation Event (Prompt Metadata, Model Selection, User)
+    IAA->>GSAI: Call Governed Enterprise API (Masked/Prompt, No Retention/Training Policy)
+    GSAI-->>IAA: Return AI Output (Suggestion, Model Metadata)
+    IAA->>GAL: Log Post-Invocation Event (Output, Decisions, Safety Checks)
+    IAA-->>UI: Present Suggestion as Editable Draft (Human Review Required)
+    Auditor->>UI: Review, Edit, Accept/Reject Suggestion
+    alt Accept
+        UI->>WAL: Save Accepted Changes (New Version, AI-Assisted Flag)
+        WAL->>DB: Store Updated Structured Content & Version
+        DB-->>WAL: Confirm
+        WAL->>EB: Emit Event (AIAssistedVersionCreated, Details)
+        EB->>GAL: Append Full AI Interaction Audit Trail
+    else Reject
+        UI->>IAA: Log Rejection (Feedback for Improvement)
+        IAA->>EB: Emit Event (AISuggestionRejected)
+        EB->>GAL: Append Rejection Event
+    end
+    Note over IAA,GAL: All Prompts/Outputs Logged&#59; Human-in-Loop Enforced&#59; No Auto-Commit
+
+================
+
+==> Diagram 15 ==
+graph TD
+    subgraph IA["IA Meridian Components"]
+        TMG["Template & Methodology Governance Component<br/>Interfaces: Template Management API<br/>Dependencies: DB (Schemas Storage)"]
+        WAL["Workpaper Authoring & Lifecycle Component<br/>Interfaces: Authoring API, Lifecycle State Machine<br/>Dependencies: TMG (Schemas), DB (Content), EB (Events)"]
+        CR["Collaboration & Review Component<br/>Interfaces: Comments API, Notifications Port<br/>Dependencies: WAL (Workpapers), EB (Events)"]
+        IAA["Intelligent Assistance & Automation Component<br/>Interfaces: AI Orchestration API<br/>Dependencies: GSAI (AI Models), GAL (Logging), WAL (Context)"]
+        GAL["Governance, Audit Trail & Lineage Component<br/>Interfaces: Audit Query API, Lineage Verification Port<br/>Dependencies: KDS (Event Store), S3 (Archives)"]
+        UAO["Usage Analytics & Operational Insights Component<br/>Interfaces: Analytics API, Dashboard Port<br/>Dependencies: GAL (Events), Athena (Queries), QS (Viz)"]
+        PCS["Platform & Cross-Cutting Services Component<br/>Interfaces: IAM Port, Observability API<br/>Dependencies: Cognito, CW, KMS"]
+    end
+
+    TMG -->|"Provides Schemas"| WAL
+    WAL -->|"Triggers Reviews"| CR
+    CR -->|"Emits Events"| GAL
+    WAL -->|"Requests Assistance"| IAA
+    IAA -->|"Logs Interactions"| GAL
+    AllComponents -->|"Emit Events"| EB["EventBridge Component<br/>Central Event Bus"]
+    EB -->|"Routes/Triggers"| AllComponents
+    EB -->|"Audit Stream"| GAL
+    UAO -->|"Consumes Projections"| GAL
+
+    WAL -->|"Stores Data"| DB["DynamoDB Component<br/>Structured Storage"]
+    GAL -->|"Appends Events"| KDS["Kinesis Data Streams Component<br/>Append-Only Log"]
+    KDS -->|"Archives"| S3["S3 Component<br/>Object Storage"]
+    UAO -->|"Queries"| Athena["Athena Component<br/>Query Engine"]
+    Athena -->|"Visualizes"| QS["QuickSight Component<br/>BI Tool"]
+
+    IAA -->|"Invokes Models"| GSAI["GS-AI External Component<br/>AI Provider Interface"]
+
+    subgraph EXT["External System Components"]
+        AB["AuditBoard/APEX Component<br/>Archival Interface"]
+        GRC["GRC Component<br/>Issue Management API"]
+        DL["Data Lake Component<br/>Data Source Port"]
+    end
+
+    INT["Integration Layer Component<br/>API/Event Adapters"] -->|"Exports"| AB
+    INT -->|"Pushes Data"| GRC
+    INT -->|"Pulls Evidence"| DL
+    AllComponents -->|"Integrates via"| INT
+
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style INT fill:#ffb,stroke:#333
+
+================
+
+==> Diagram 16 ==
+graph TB
+    subgraph "AWS Account / Region (e.g., us-west-2)"
+        subgraph "VPC (Virtual Private Cloud)"
+            subgraph "Public Subnets"
+                IGW[Internet Gateway] --> ALB[Application Load Balancer<br>Exposes UI APIs]
+                ALB --> APIGW[API Gateway<br>REST Endpoints, Auth]
+            end
+
+            subgraph "Private Subnets"
+                subgraph "EKS Cluster (Kubernetes)"
+                    ControlPlane[EKS Control Plane<br>Managed by AWS]
+                    WorkerNodes[Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA[AI Orchestration Pod<br>Lambda Integrations for AI Calls]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS[Platform Services Pod]
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB[DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata]
+                KDS[Kinesis Data Streams<br>Append-Only Audit Events]
+                S3[S3 Buckets<br>Immutable Exports, Logs, Projections]
+                Athena[Athena<br>Query Engine for S3]
+                QS[QuickSight<br>BI Dashboards]
+                EB[EventBridge<br>Event Bus & Rules]
+                CW[CloudWatch<br>Logs, Metrics, Alarms]
+                Cognito[Cognito<br>User Pools, Identity]
+                KMS[KMS<br>Key Management]
+
+                EKS --> DB
+                EKS --> KDS
+                EKS --> S3
+                EKS --> Athena
+                EKS --> QS
+                EKS --> EB
+                EKS --> CW
+                EKS --> Cognito
+                EKS --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKS
+            EKS --> NAT
+        end
+
+        subgraph "External Services (Integrated)"
+            GSAI[GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink]
+            AB[AuditBoard/APEX<br>Via API/Events]
+            GRC[GRC Platforms<br>Via API/Events]
+            DL[Data Lake<br>Via S3/API]
+            HCM[HCM Systems<br>Via API]
+            SIMPL[SIMPL<br>Via API]
+        end
+
+        EKS -->|Governed API Calls| GSAI
+        EKS -->|Exports/Events via Integration Layer| AB
+        EKS -->|Push Findings| GRC
+        EKS -->|Pull Evidence| DL
+        EKS -->|User Sync| HCM
+        EKS -->|Data Exchange| SIMPL
+    end
+
+    subgraph "Users (External)"
+        Auditors[Auditors / Reviewers<br>Browser Access]
+        Managers[Managers / Leadership<br>Browser Access]
+    end
+
+    Auditors -->|HTTPS| IGW
+    Managers -->|HTTPS| IGW
+
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style Public Subnets fill:#dfd,stroke:#333
+    style Private Subnets fill:#dfd,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style External Services fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+
+================
+
+==> Diagram 17 ==
+graph TD
+    subgraph "Users"
+        Auditors["Auditors / Reviewers"]
+        Managers["IA Managers / Leadership"]
+    end
+
+    subgraph "Frontend"
+        UI["Browser-Based UI\n- Template-Driven Authoring\n- Parallel Editing (Confluence-style)\n- Threaded Comments & Reviews\n- Version Comparison (Diffs)\n- Notifications"]
+    end
+
+    Auditors -->|Interact via Browser| UI
+    Managers -->|Interact via Browser| UI
+
+    subgraph "AWS Network & Security"
+        VPC[VPC]
+        IGW[Internet Gateway]
+        SG[Security Groups]
+        NACL[Network ACLs]
+        WAF[WAF for API Protection]
+    end
+
+    UI -->|"HTTPS Traffic"| APIGW["API Gateway\n- REST APIs\n- Authentication\n- Rate Limiting"]
+
+    subgraph "Core Platform Services (EKS Cluster)"
+        APIGW -->|"Route & Authorize"| Services
+
+        subgraph "Domains as Microservices (Pods in EKS)"
+            TMG["Template & Methodology Governance\n- Manage ~100 Templates (~13 Types)\n- Schemas, Presentation Models, Layouts\n- Lifecycle: Draft->Reviewed->Approved->Published\n- Methodology Rules: Mandatory Fields, Validations\n- Context Taxonomy: businessProcess, activity, subActivity\n- Mappings to Templates\n(Containers, DynamoDB for Storage)"]
+            WAL["Workpaper Authoring & Lifecycle\n- Create from Templates (workpaperId, templateType)\n- Store Structured Fields, Narratives\n- Context: auditEngagementId, businessProcess etc.\n- State Machine: Draft->In Review->Rework->Approved->Finalized\n- Immutable Versions on Save\n- Generate Exports (PDF/Word) with Hashes\n(Containers, DynamoDB for Content)"]
+            CR["Collaboration & Review\n- Threaded Comments Anchored to Fields/Sections\n- Review Assignments & Workflows\n- Notifications (Email/In-App) for Mentions, Changes\n- Presence Indicators for Parallel Editing\n(Containers, DynamoDB for Metadata)"]
+            IAA["Intelligent Assistance & Automation\n- AI Orchestration Service\n- Generative: Drafting, Summarizing, Gap Checks\n- Agentic: Evidence Assembly, Pre-Populate, Test Plans\n- Human-in-the-Loop: Suggestions Only\n- Log Prompts/Outputs to Audit Trail\n- Data Masking/Minimization\n- Integrate with GS-AI (Lambda Triggers)\n(Containers, Lambda for AI Invocations)"]
+            GAL["Governance, Audit Trail & Lineage\n- Append-Only Event Store (All Actions: Edits, AI, Exports)\n- Tamper-Evident Logs\n- Data Lineage: Sources to Workpapers to Exports\n- Cryptographic Hashes for Integrity Verification\n- Retention & Access Governance\n- Historical Reconstruction APIs\n(Containers, Kinesis for Events, S3 Archive)"]
+            UAO["Usage Analytics & Operational Insights\n- Collect Telemetry/Events\n- Compute KPIs: Time per Stage, Revisions, AI Impact\n- Segments by Context Dimensions\n- Dashboards for Bottlenecks, Adoption\n- Entitlement-Aware (No Micro-Surveillance)\n(Containers, Athena Queries, QuickSight Viz)"]
+            PCS["Platform & Cross-Cutting Services\n- IAM: Cognito SSO, RBAC/ABAC\n- Security: KMS Encryption, Secrets Mgr\n- Infra: EKS Scaling, Backup/Restore\n- Observability: CloudWatch Logs/Metrics/Alarms\n- Integration: API GW, EventBridge, SQS\n- Data Storage Patterns: Regional Isolation\n(Shared Across Domains)"]
+        end
+    end
+
+    TMG -->|"Provide Schemas/Rules"| WAL
+    WAL -->|"Trigger Collaboration"| CR
+    CR -->|"Emit Comments/Reviews"| GAL
+    WAL -->|"Request AI Assistance"| IAA
+    IAA -->|"Log Interactions"| GAL
+    Services[All Domains] -->|"Emit Domain Events"| EB["EventBridge\n- Event Bus\n- Trigger Workflows\n- Notifications\n- Integration Events"]
+    EB -->|"Route to Domains"| Services
+    EB -->|"Stream Audit Events"| GAL
+    UAO -->|"Consume Projections"| GAL
+
+    WAL -->|"Store Workpapers/Versions"| DB["DynamoDB\n- Structured Data\n- Versions\n- Metadata\n- Schemas"]
+    TMG -->|"Store Templates"| DB
+    CR -->|"Store Comments"| DB
+    GAL -->|"Append Events"| KDS["Kinesis Data Streams\n- Audit Trail Events\n- Lineage Records"]
+    KDS -->|"Long-Term Archive"| S3["S3 Buckets\n- Immutable Exports (PDFs w/ Hashes)\n- Logs\n- Projections for Analytics"]
+    UAO -->|"Query S3 Data"| Athena["Athena\n- SQL Queries on Projections\n- Metrics Aggregation"]
+    Athena -->|"Visualize KPIs"| QS["QuickSight\n- Dashboards\n- Reports for Leadership"]
+
+    IAA -->|"Invoke AI (Governed)"| GSAI["Internal GS-AI Platform\n- Enterprise Models\n- No Data Retention/Training\n- API via Lambda/Gateway"]
+    GSAI -->|"Return Suggestions (Logged)"| IAA
+
+    subgraph "External Integrations"
+        AB["AuditBoard/APEX\n- Audit Planning/Scheduling\n- Issue Lifecycle\n- Final Archival"]
+        GRC["GRC Platforms\n- Governance, Risk, Compliance\n- Issue Management"]
+        DL["Data Lake\n- Source Evidence\n- Authoritative Data"]
+        HCM["HCM Systems\n- User/Employee Data"]
+        SIMPL["SIMPL\n- Other Audit Tools"]
+    end
+
+    Services -->|"Exports: PDFs, Structured Data"| INT["Integration Layer\n- API Gateway for Sync APIs\n- EventBridge for Async Events\n- SQS Queues for Reliability\n- Idempotent Processing"]
+    INT -->|"Push Final Artifacts"| AB
+    INT -->|"Push Findings/Status"| GRC
+    INT -->|"Pull Evidence/Data"| DL
+    INT -->|"Sync Users/Roles"| HCM
+    INT -->|"Other Data Exchange"| SIMPL
+
+    PCS -->|"Monitor All"| CW["CloudWatch\n- Logs\n- Metrics\n- Alarms\n- Tracing"]
+    PCS -->|"Authenticate/Authorize"| Cognito["Cognito\n- SSO Integration\n- Role-Based Access\n- Attribute-Based Control"]
+    PCS -->|"Encrypt/Manage Keys"| KMS["KMS\n- Data Encryption\n- Secrets Management"]
+    PCS -->|"Backup & Recovery"| Backup["AWS Backup\n- RTO/RPO Compliance\n- Snapshot Management"]
+
+    subgraph "Infrastructure"
+        EKS["EKS Cluster\n- Kubernetes Orchestration\n- Auto-Scaling Pods\n- Containerized Microservices\n- On-Prem/AWS Hybrid Support"]
+        EKS -->|"Host & Scale"| Services
+    end
+
+    VPC --> IGW
+    VPC -->|"Secure Enclosure"| EKS
+    VPC -->|"Enclose Resources"| DB
+    VPC -->|"Enclose Resources"| S3
+    VPC -->|"Enclose Resources"| EB
+    VPC -->|"Enclose Resources"| APIGW
+    VPC -->|"Enclose Resources"| KDS
+    VPC -->|"Enclose Resources"| Athena
+    VPC -->|"Enclose Resources"| QS
+    VPC -->|"Enclose Resources"| CW
+    VPC -->|"Enclose Resources"| Cognito
+    VPC -->|"Enclose Resources"| KMS
+    APIGW --> WAF
+
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+    style UI fill:#bbf,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style Backup fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style WAF fill:#ffb,stroke:#333
+
+================
+
+==> Diagram 18 ==
+sequenceDiagram
+    participant Services as Domain Services
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+    participant UAO as Usage Analytics & Operational Insights
+    participant S3 as S3 Projections
+    participant Athena as Athena
+    participant QS as QuickSight
+    participant Leadership as IA Leadership
+
+    Services->>EB: Emit Telemetry Events (e.g., TimeSpent, Revisions)
+    EB->>GAL: Stream to Audit Trail
+    GAL->>S3: Project Events to Optimized Store (Aggregations)
+    UAO->>Athena: Query Projections (e.g., Bottlenecks by Section)
+    Athena-->>UAO: Return Aggregated Metrics (e.g., Avg Time per Stage)
+    UAO->>QS: Update Dashboards (KPIs: Rework Cycles, AI Adoption)
+    QS-->>Leadership: View Insights (e.g., Methodology Effectiveness)
+
+================
+
+==> Diagram 19 ==
+sequenceDiagram
+    participant Manager as IA Manager
+    participant UI as Browser UI
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant CR as Collaboration & Review
+    participant INT as Integration Layer
+    participant AB as AuditBoard/APEX
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+
+    Manager->>UI: Initiate Review (Assign Reviewer)
+    UI->>CR: Assign Review (workpaperId, reviewer)
+    CR->>EB: Emit Event (ReviewAssigned)
+    EB->>GAL: Log Assignment
+    Reviewer->>UI: Provide Feedback/Approve
+    UI->>CR: Update Review State (e.g., Approved)
+    CR->>WAL: Transition Lifecycle (to Finalized)
+    WAL->>EB: Emit Event (StateChanged: Finalized)
+    EB->>GAL: Log State Change
+    WAL->>INT: Generate Export (PDF/Word with Hash)
+    INT->>AB: Push Immutable Artifact & Structured Data (API/Event)
+    AB-->>INT: Confirm Receipt
+    INT->>GAL: Log Export Event with Hash
+    GAL->>KDS: Append Integrity Record
+
+================
+
+==> Diagram 20 ==
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation
+    participant GSAI as GS-AI Platform
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+
+    Auditor->>UI: Request AI Assistance (e.g., Draft Section, Summarize)
+    UI->>IAA: Invoke Orchestration (workpaperId, context, inputs, masked data)
+    IAA->>GAL: Log Prompt & Metadata (Before Invocation)
+    IAA->>GSAI: Call Governed Model (Enterprise API, No Retention)
+    GSAI-->>IAA: Return Suggestion (e.g., Draft Text)
+    IAA->>GAL: Log Output & Model Details
+    IAA-->>UI: Present Suggestion (Human-in-the-Loop)
+    Auditor->>UI: Review/Edit/Accept Suggestion
+    UI->>WAL: Save Accepted Changes as New Version
+    WAL->>EB: Emit Event (AIAssistedUpdate)
+    EB->>GAL: Log Full AI Interaction Event
+
+================
+
+==> Diagram 21 ==
+sequenceDiagram
+    participant Auditor1 as Auditor 1
+    participant Auditor2 as Auditor 2
+    participant UI as Browser UI
+    participant CR as Collaboration & Review
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor1->>UI: Edit Section/Field (Parallel Editing)
+    UI->>WAL: Save Changes (workpaperId, updates)
+    WAL->>DB: Create New Immutable Version
+    DB-->>WAL: Confirm Version
+    WAL->>EB: Emit Event (VersionUpdated)
+    EB->>GAL: Log Edit Event (Who, What, When)
+    EB->>CR: Trigger Presence Update
+    CR-->>UI: Update Presence Indicators (Auditor2 sees Auditor1 editing)
+    Auditor1->>UI: Add Threaded Comment (Anchored to Field)
+    UI->>CR: Post Comment (workpaperId, section, text)
+    CR->>DB: Store Comment Metadata
+    DB-->>CR: Confirm
+    CR->>EB: Emit Event (CommentAdded)
+    EB->>GAL: Log Comment Event
+    EB->>UI: Notify Auditor2 (In-App/Email for Mention)
+    Auditor2->>UI: Review & Respond to Comment
+    UI->>CR: Update Comment (Resolve/Reject)
+    CR->>EB: Emit Event (CommentResolved)
+    EB->>GAL: Log Resolution
+
+================
+
+==> Diagram 22 ==
+sequenceDiagram
+    participant Auditor as Auditor (User)
+    participant UI as Browser UI
+    participant TMG as Template & Methodology Governance
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor->>UI: Select Template Type
+    UI->>TMG: Request Latest Template Schema (via API)
+    TMG->>DB: Fetch Schema, Rules, Taxonomy
+    DB-->>TMG: Return Schema Data
+    TMG-->>UI: Provide Schema & Presentation Model
+    UI->>WAL: Create New Workpaper (workpaperId, templateType, context: auditEngagementId, businessProcess)
+    WAL->>DB: Store Initial Structured Content & Metadata (State: Draft)
+    DB-->>WAL: Confirm Storage
+    WAL->>EB: Emit Event (WorkpaperCreated)
+    EB->>GAL: Log Audit Event
+    GAL->>KDS: Append Immutable Event
+    WAL-->>UI: Return workpaperId & Initial View
+    UI-->>Auditor: Display Editable Workpaper
+================
+
+==> Diagram 23 ==
+graph TD
+    subgraph AWS["AWS Account / Region (e.g., us-west-2)"]
+        subgraph VPC["VPC (Virtual Private Cloud)"]
+            subgraph PublicSubnets["Public Subnets"]
+                IGW[Internet Gateway] --> ALB["Application Load Balancer<br>Exposes UI APIs"]
+                ALB --> APIGW["API Gateway<br>REST Endpoints, Auth"]
+            end
+
+            subgraph PrivateSubnets["Private Subnets"]
+                subgraph EKSCluster["EKS Cluster (Kubernetes)"]
+                    ControlPlane["EKS Control Plane<br>Managed by AWS"]
+                    WorkerNodes["Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods & AI Agents"]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA["AI Orchestration Pod<br>Manages Micro-Agent Lifecycle & Invocations<br>Lambda Integrations for AI Calls"]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS["Platform Services Pod<br>Includes Shared Security, IAM, Observability"]
+                    WorkerNodes --> DataInterface["Data Interface Pod<br>Centralized Uniform Access to Internal Data Sources<br>e.g., Data Lake, HCM, SIMPL via APIs"]
+                    WorkerNodes --> MCPServer["MCP Server Pod<br>Server-Client Model for Tool Access<br>Handles External Tool Integrations"]
+                    WorkerNodes --> FunctionTools["Function Tools Pod<br>Registry of Callable Functions<br>e.g., Custom Scripts, APIs"]
+                    WorkerNodes --> MemoryStore["Memory Store Pod<br>Session Management & State Persistence<br>e.g., Redis or DynamoDB Extension"]
+                    subgraph MicroAIAgents["Micro-AI Agents (Deployed by Teams)"]
+                        Agent1["Micro-Agent Pod 1<br>Task-Specific: e.g., Evidence Validation Agent<br>Deployed by Audit Team A<br>Containerized, Independent Scaling"]
+                        Agent2["Micro-Agent Pod 2<br>Task-Specific: e.g., Risk Assessment Agent<br>Deployed by Risk Team B<br>Isolated Namespace, No Impact on Others"]
+                        AgentN["Micro-Agent Pod N<br>Task-Specific: e.g., Compliance Check Agent<br>Deployed by Future Teams<br>Modular & Extensible"]
+                    end
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB["DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata, Agent Sessions"]
+                KDS["Kinesis Data Streams<br>Append-Only Audit Events incl. Agent Interactions"]
+                S3["S3 Buckets<br>Immutable Exports, Logs, Projections, Agent Artifacts"]
+                Athena["Athena<br>Query Engine for S3 incl. Agent Metrics"]
+                QS["QuickSight<br>BI Dashboards incl. Agent Usage KPIs"]
+                EB["EventBridge<br>Event Bus & Rules for Agent Triggers/Notifications"]
+                CW["CloudWatch<br>Logs, Metrics, Alarms for Agents & Services"]
+                Cognito["Cognito<br>User Pools, Identity for Agent Access Control"]
+                KMS["KMS<br>Key Management for Agent Data Encryption"]
+
+                EKSCluster --> DB
+                EKSCluster --> KDS
+                EKSCluster --> S3
+                EKSCluster --> Athena
+                EKSCluster --> QS
+                EKSCluster --> EB
+                EKSCluster --> CW
+                EKSCluster --> Cognito
+                EKSCluster --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKSCluster
+            EKSCluster --> NAT
+        end
+
+        subgraph ExtServices["External Services (Integrated)"]
+            GSAI["GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink<br>Used by Micro-Agents for Inference"]
+            AB["AuditBoard/APEX<br>Via API/Events"]
+            GRC["GRC Platforms<br>Via API/Events"]
+            DL["Data Lake<br>Via S3/API<br>Accessed via Data Interface"]
+            HCM["HCM Systems<br>Via API<br>Accessed via Data Interface"]
+            SIMPL["SIMPL<br>Via API<br>Accessed via Data Interface"]
+            ExternalTools["External Tools/Services<br>Accessed via MCP Server-Client or Function Tools"]
+        end
+
+        EKSCluster -->|"Governed API Calls from Agents"| GSAI
+        EKSCluster -->|"Exports/Events via Integration Layer"| AB
+        EKSCluster -->|"Push Findings from Agents"| GRC
+        EKSCluster -->|"Pull Evidence via Data Interface"| DL
+        EKSCluster -->|"User Sync via Data Interface"| HCM
+        EKSCluster -->|"Data Exchange via Data Interface"| SIMPL
+        EKSCluster -->|"Tool Calls from Agents"| ExternalTools
+    end
+
+    subgraph Users["Users (External)"]
+        Auditors["Auditors / Reviewers<br>Browser Access, Invoke Agents via UI"]
+        Managers["Managers / Leadership<br>Browser Access, Monitor Agent Deployments"]
+        Teams["Development Teams<br>Deploy New Micro-Agents via CI/CD Pipelines"]
+    end
+
+    Auditors -->|"HTTPS, Agent Requests"| IGW
+    Managers -->|"HTTPS, Insights"| IGW
+    Teams -->|"Secure Deployment Channels"| IGW
+
+    %% Connections for AI Agents
+    IAA -->|"Orchestrates & Deploys"| Agent1
+    IAA -->|"Orchestrates & Deploys"| Agent2
+    IAA -->|"Orchestrates & Deploys"| AgentN
+    Agent1 -->|"Tool Access (Server-Client)"| MCPServer
+    Agent2 -->|"Tool Access (Server-Client)"| MCPServer
+    AgentN -->|"Tool Access (Server-Client)"| MCPServer
+    Agent1 -->|"Function Calls"| FunctionTools
+    Agent2 -->|"Function Calls"| FunctionTools
+    AgentN -->|"Function Calls"| FunctionTools
+    Agent1 -->|"Session Memory"| MemoryStore
+    Agent2 -->|"Session Memory"| MemoryStore
+    AgentN -->|"Session Memory"| MemoryStore
+    Agent1 -->|"Shared Security/RBAC"| PCS
+    Agent2 -->|"Shared Security/RBAC"| PCS
+    AgentN -->|"Shared Security/RBAC"| PCS
+    Agent1 -->|"Log Interactions"| GAL
+    Agent2 -->|"Log Interactions"| GAL
+    AgentN -->|"Log Interactions"| GAL
+    Agent1 -->|"Emit Telemetry"| EB
+    Agent2 -->|"Emit Telemetry"| EB
+    AgentN -->|"Emit Telemetry"| EB
+    DataInterface -->|"Proxy Calls"| DL
+    DataInterface -->|"Proxy Calls"| HCM
+    DataInterface -->|"Proxy Calls"| SIMPL
+    MCPServer -->|"Integrate"| ExternalTools
+    FunctionTools -->|"Invoke"| ExternalTools
+    MemoryStore -->|"Persist"| DB
+    Teams -->|"Deploy Without Impact<br>(Isolated Pods/Namespaces)"| WorkerNodes
+
+    %% Styles (Consistent with Original Diagrams)
+    style AWS fill:#eee,stroke:#333
+    style VPC fill:#eee,stroke:#333,stroke-dasharray:5 5
+    style PublicSubnets fill:#dfd,stroke:#333
+    style PrivateSubnets fill:#dfd,stroke:#333
+    style EKSCluster fill:#bfb,stroke:#333
+    style MicroAIAgents fill:#ddf,stroke:#333,stroke-dasharray:3 3
+    style ExtServices fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DataInterface fill:#dfd,stroke:#333
+    style MCPServer fill:#dfd,stroke:#333
+    style FunctionTools fill:#dfd,stroke:#333
+    style MemoryStore fill:#dfd,stroke:#333
+    style Agent1 fill:#ddf,stroke:#333
+    style Agent2 fill:#ddf,stroke:#333
+    style AgentN fill:#ddf,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style ExternalTools fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+    style Teams fill:#f9f,stroke:#333
+================
+
+==> Diagram 24 ==
+sequenceDiagram
+    participant User as User
+    participant CI as "CI/CD"
+    participant IAA as AI_Orchestrator
+    participant EKS as EKS_ControlPlane
+    participant Agent as MicroAgent_Pod
+    participant MCP as MCP_Server
+    participant DI as DataInterface
+    participant MS as MemoryStore
+    participant GAL as AuditTrail
+    participant ET as ExternalTools
+
+    User->>CI: Push agent code and config
+    CI->>CI: Build image and run tests
+    CI->>EKS: Deploy image - create or update Deployment
+    EKS->>IAA: Notify new or updated deployment
+    IAA->>EKS: Schedule rollout to target namespace
+    EKS->>Agent: Pull image and start pod
+    Agent->>DI: Fetch configuration and credentials
+    Agent->>MS: Load session state if exists
+    Agent->>DI: Retrieve evidence and input data
+    Agent->>Agent: Initialize runtime and models
+    Agent->>MCP: Request tool access via server client
+    MCP-->>Agent: Provide tool endpoints and tokens
+    Agent->>ET: Invoke external tool via MCP if needed
+    ET-->>Agent: Return tool results
+    Agent->>Agent: Process data and generate findings
+    Agent->>MS: Persist session memory and state
+    Agent->>GAL: Log interactions and audit events
+    Agent->>IAA: Emit telemetry and health metrics
+    IAA->>EKS: Autoscale or replicate agent pods if required
+    User->>Agent: Trigger on demand run or review results
+    Agent-->>User: Return results and UI payload
+    Agent->>EKS: Graceful shutdown or redeploy on update
+    EKS->>CI: Archive logs and artifacts optional
+================

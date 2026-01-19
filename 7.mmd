@@ -1,0 +1,110 @@
+graph TB
+    subgraph "AWS Account / Region (e.g., us-west-2)"
+        subgraph "VPC (Virtual Private Cloud)"
+            subgraph "Public Subnets"
+                IGW[Internet Gateway] --> ALB[Application Load Balancer<br>Exposes UI APIs]
+                ALB --> APIGW[API Gateway<br>REST Endpoints, Auth]
+            end
+
+            subgraph "Private Subnets"
+                subgraph "EKS Cluster (Kubernetes)"
+                    ControlPlane[EKS Control Plane<br>Managed by AWS]
+                    WorkerNodes[Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA[AI Orchestration Pod<br>Lambda Integrations for AI Calls]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS[Platform Services Pod]
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB[DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata]
+                KDS[Kinesis Data Streams<br>Append-Only Audit Events]
+                S3[S3 Buckets<br>Immutable Exports, Logs, Projections]
+                Athena[Athena<br>Query Engine for S3]
+                QS[QuickSight<br>BI Dashboards]
+                EB[EventBridge<br>Event Bus & Rules]
+                CW[CloudWatch<br>Logs, Metrics, Alarms]
+                Cognito[Cognito<br>User Pools, Identity]
+                KMS[KMS<br>Key Management]
+
+                EKS --> DB
+                EKS --> KDS
+                EKS --> S3
+                EKS --> Athena
+                EKS --> QS
+                EKS --> EB
+                EKS --> CW
+                EKS --> Cognito
+                EKS --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKS
+            EKS --> NAT
+        end
+
+        subgraph "External Services (Integrated)"
+            GSAI[GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink]
+            AB[AuditBoard/APEX<br>Via API/Events]
+            GRC[GRC Platforms<br>Via API/Events]
+            DL[Data Lake<br>Via S3/API]
+            HCM[HCM Systems<br>Via API]
+            SIMPL[SIMPL<br>Via API]
+        end
+
+        EKS -->|Governed API Calls| GSAI
+        EKS -->|Exports/Events via Integration Layer| AB
+        EKS -->|Push Findings| GRC
+        EKS -->|Pull Evidence| DL
+        EKS -->|User Sync| HCM
+        EKS -->|Data Exchange| SIMPL
+    end
+
+    subgraph "Users (External)"
+        Auditors[Auditors / Reviewers<br>Browser Access]
+        Managers[Managers / Leadership<br>Browser Access]
+    end
+
+    Auditors -->|HTTPS| IGW
+    Managers -->|HTTPS| IGW
+
+    style VPC fill:#eee,stroke:#333,stroke-dasharray: 5 5
+    style Public Subnets fill:#dfd,stroke:#333
+    style Private Subnets fill:#dfd,stroke:#333
+    style EKS fill:#bfb,stroke:#333
+    style External Services fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333

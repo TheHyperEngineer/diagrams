@@ -1,0 +1,35 @@
+graph LR
+  subgraph "IA Meridian Domains"
+    TMG[TMG<br/>Template Governance]
+    WAL[WAL<br/>Workpaper Authoring]
+    CR[CR<br/>Collaboration & Review]
+    IAA[IAA<br/>AI Orchestration]
+    GAL[GAL<br/>Audit Trail & Lineage]
+    UAO[UAO<br/>Analytics & Insights]
+    PCS[PCS<br/>Platform Services]
+  end
+
+  subgraph "External Systems"
+    AB[AuditBoard/APEX]
+    GRC[GRC Platforms]
+    DL[Data Lake]
+    GSAI[GS-AI Platform]
+  end
+
+  EB[Event Bus<br/>EventBridge/Kinesis]
+  ALL[All Domains]
+
+  WAL -->|Emit Events| EB
+  EB --> GAL
+  EB --> UAO
+  TMG -->|Schemas/Rules| WAL
+  CR -->|Review Outcomes| WAL
+  IAA -->|Prompts/Outputs logged| GAL
+  WAL -->|Exports PDF + Hash| AB
+  WAL -->|Findings| GRC
+  WAL -->|Pull Evidence| DL
+  IAA -->|Call Models| GSAI
+  PCS -->|Auth/Keys/Observability| ALL
+  style EB fill:#ffb,stroke:#333
+  style GAL fill:#dfd,stroke:#333
+  style UAO fill:#dfd,stroke:#333

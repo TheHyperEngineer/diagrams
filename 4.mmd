@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Manager as IA Manager
+    participant UI as Browser UI
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant CR as Collaboration & Review
+    participant INT as Integration Layer
+    participant AB as AuditBoard/APEX
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+
+    Manager->>UI: Initiate Review (Assign Reviewer)
+    UI->>CR: Assign Review (workpaperId, reviewer)
+    CR->>EB: Emit Event (ReviewAssigned)
+    EB->>GAL: Log Assignment
+    Reviewer->>UI: Provide Feedback/Approve
+    UI->>CR: Update Review State (e.g., Approved)
+    CR->>WAL: Transition Lifecycle (to Finalized)
+    WAL->>EB: Emit Event (StateChanged: Finalized)
+    EB->>GAL: Log State Change
+    WAL->>INT: Generate Export (PDF/Word with Hash)
+    INT->>AB: Push Immutable Artifact & Structured Data (API/Event)
+    AB-->>INT: Confirm Receipt
+    INT->>GAL: Log Export Event with Hash
+    GAL->>KDS: Append Integrity Record

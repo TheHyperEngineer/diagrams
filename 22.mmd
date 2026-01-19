@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Auditor as Auditor (User)
+    participant UI as Browser UI
+    participant TMG as Template & Methodology Governance
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor->>UI: Select Template Type
+    UI->>TMG: Request Latest Template Schema (via API)
+    TMG->>DB: Fetch Schema, Rules, Taxonomy
+    DB-->>TMG: Return Schema Data
+    TMG-->>UI: Provide Schema & Presentation Model
+    UI->>WAL: Create New Workpaper (workpaperId, templateType, context: auditEngagementId, businessProcess)
+    WAL->>DB: Store Initial Structured Content & Metadata (State: Draft)
+    DB-->>WAL: Confirm Storage
+    WAL->>EB: Emit Event (WorkpaperCreated)
+    EB->>GAL: Log Audit Event
+    GAL->>KDS: Append Immutable Event
+    WAL-->>UI: Return workpaperId & Initial View
+    UI-->>Auditor: Display Editable Workpaper

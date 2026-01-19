@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant User as User
+    participant CI as "CI/CD"
+    participant IAA as AI_Orchestrator
+    participant EKS as EKS_ControlPlane
+    participant Agent as MicroAgent_Pod
+    participant MCP as MCP_Server
+    participant DI as DataInterface
+    participant MS as MemoryStore
+    participant GAL as AuditTrail
+    participant ET as ExternalTools
+
+    User->>CI: Push agent code and config
+    CI->>CI: Build image and run tests
+    CI->>EKS: Deploy image - create or update Deployment
+    EKS->>IAA: Notify new or updated deployment
+    IAA->>EKS: Schedule rollout to target namespace
+    EKS->>Agent: Pull image and start pod
+    Agent->>DI: Fetch configuration and credentials
+    Agent->>MS: Load session state if exists
+    Agent->>DI: Retrieve evidence and input data
+    Agent->>Agent: Initialize runtime and models
+    Agent->>MCP: Request tool access via server client
+    MCP-->>Agent: Provide tool endpoints and tokens
+    Agent->>ET: Invoke external tool via MCP if needed
+    ET-->>Agent: Return tool results
+    Agent->>Agent: Process data and generate findings
+    Agent->>MS: Persist session memory and state
+    Agent->>GAL: Log interactions and audit events
+    Agent->>IAA: Emit telemetry and health metrics
+    IAA->>EKS: Autoscale or replicate agent pods if required
+    User->>Agent: Trigger on demand run or review results
+    Agent-->>User: Return results and UI payload
+    Agent->>EKS: Graceful shutdown or redeploy on update
+    EKS->>CI: Archive logs and artifacts optional

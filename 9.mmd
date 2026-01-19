@@ -1,0 +1,46 @@
+graph TD
+    subgraph "Cross-Cutting Context"
+        TAX[Context & Taxonomy Model<br>- Dimensions: businessProcess, activity, subActivity, action<br>- Owned by Template Domain<br>- Mappings to Templates]
+    end
+
+    subgraph "Domains as Microservices"
+        TMG["Template & Methodology Governance Domain<br>- Manage Templates (Schemas, Presentation, Layouts)<br>- Lifecycle: Draft->Reviewed->Approved->Published<br>- Methodology Rules & Validations<br>- Taxonomy Ownership"]
+        WAL["Workpaper Authoring & Lifecycle Domain<br>- Create/Edit Workpapers (Structured Fields, Narratives)<br>- Lifecycle States: Draft->In Review->Approved->Finalized<br>- Immutable Versioning<br>- Exports with Hashes"]
+        CR["Collaboration & Review Domain<br>- Threaded Comments & Assignments<br>- Parallel Editing & Presence<br>- Review Workflows & Notifications"]
+        IAA["Intelligent Assistance & Automation Domain<br>- AI Orchestration Service<br>- Generative Assistance (Drafting, Summarizing)<br>- Agentic Workflows (Evidence Assembly, Pre-Populate)<br>- Human-in-the-Loop & Logging"]
+        GAL["Governance, Audit Trail & Lineage Domain<br>- Append-Only Event Store<br>- Tamper-Evident Logs<br>- Data Lineage & Integrity Hashes<br>- Historical Reconstruction"]
+        UAO["Usage Analytics & Operational Insights Domain<br>- Telemetry Collection & KPIs<br>- Dashboards for Bottlenecks & Adoption<br>- Projections from Events"]
+        PCS["Platform & Cross-Cutting Services Domain<br>- IAM, SSO, RBAC/ABAC<br>- Security & Compliance<br>- Infrastructure & Observability<br>- Integration Framework"]
+    end
+
+    TMG -->|Schemas/Rules/Taxonomy| WAL
+    WAL -->|Workpaper Context| CR
+    WAL -->|Assistance Requests| IAA
+    IAA -->|Interactions & Outputs| GAL
+    CR -->|Comments/Reviews| GAL
+    WAL -->|Versions/States| GAL
+    AllDomains[All Domains] -->|Emit Events| EB[EventBridge<br>Central Event Bus]
+    EB -->|Trigger/Notify| AllDomains
+    EB -->|Audit Stream| GAL
+    GAL -->|Projections| UAO
+    UAO -->|Insights| TMG
+    PCS -->|Provides Services To| AllDomains
+    TAX -->|Used By| AllDomains
+
+    subgraph "External Integrations (via PCS/Integration Framework)"
+        EXT[External Systems<br>AuditBoard, APEX, GRC, Data Lake, GS-AI]
+    end
+
+    PCS -->|APIs/Events| EXT
+    IAA -->|Governed Calls| EXT
+
+    style TAX fill:#eee,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style EXT fill:#fdd,stroke:#333

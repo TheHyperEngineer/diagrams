@@ -1,0 +1,58 @@
+graph TD
+    subgraph IA["IA Meridian Components"]
+        TMG["Template & Methodology Governance Component<br/>Interfaces: Template Management API<br/>Dependencies: DB (Schemas Storage)"]
+        WAL["Workpaper Authoring & Lifecycle Component<br/>Interfaces: Authoring API, Lifecycle State Machine<br/>Dependencies: TMG (Schemas), DB (Content), EB (Events)"]
+        CR["Collaboration & Review Component<br/>Interfaces: Comments API, Notifications Port<br/>Dependencies: WAL (Workpapers), EB (Events)"]
+        IAA["Intelligent Assistance & Automation Component<br/>Interfaces: AI Orchestration API<br/>Dependencies: GSAI (AI Models), GAL (Logging), WAL (Context)"]
+        GAL["Governance, Audit Trail & Lineage Component<br/>Interfaces: Audit Query API, Lineage Verification Port<br/>Dependencies: KDS (Event Store), S3 (Archives)"]
+        UAO["Usage Analytics & Operational Insights Component<br/>Interfaces: Analytics API, Dashboard Port<br/>Dependencies: GAL (Events), Athena (Queries), QS (Viz)"]
+        PCS["Platform & Cross-Cutting Services Component<br/>Interfaces: IAM Port, Observability API<br/>Dependencies: Cognito, CW, KMS"]
+    end
+
+    TMG -->|"Provides Schemas"| WAL
+    WAL -->|"Triggers Reviews"| CR
+    CR -->|"Emits Events"| GAL
+    WAL -->|"Requests Assistance"| IAA
+    IAA -->|"Logs Interactions"| GAL
+    AllComponents -->|"Emit Events"| EB["EventBridge Component<br/>Central Event Bus"]
+    EB -->|"Routes/Triggers"| AllComponents
+    EB -->|"Audit Stream"| GAL
+    UAO -->|"Consumes Projections"| GAL
+
+    WAL -->|"Stores Data"| DB["DynamoDB Component<br/>Structured Storage"]
+    GAL -->|"Appends Events"| KDS["Kinesis Data Streams Component<br/>Append-Only Log"]
+    KDS -->|"Archives"| S3["S3 Component<br/>Object Storage"]
+    UAO -->|"Queries"| Athena["Athena Component<br/>Query Engine"]
+    Athena -->|"Visualizes"| QS["QuickSight Component<br/>BI Tool"]
+
+    IAA -->|"Invokes Models"| GSAI["GS-AI External Component<br/>AI Provider Interface"]
+
+    subgraph EXT["External System Components"]
+        AB["AuditBoard/APEX Component<br/>Archival Interface"]
+        GRC["GRC Component<br/>Issue Management API"]
+        DL["Data Lake Component<br/>Data Source Port"]
+    end
+
+    INT["Integration Layer Component<br/>API/Event Adapters"] -->|"Exports"| AB
+    INT -->|"Pushes Data"| GRC
+    INT -->|"Pulls Evidence"| DL
+    AllComponents -->|"Integrates via"| INT
+
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style INT fill:#ffb,stroke:#333

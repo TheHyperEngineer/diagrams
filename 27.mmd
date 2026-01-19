@@ -1,0 +1,125 @@
+sequenceDiagram
+    autonumber
+    participant User as Auditor / Reviewer
+    participant WebUI as Web UI (Viewer, Webforms, AI Controls)
+    participant Auth as Auth Service
+    participant Session as Session Service
+    participant Renderer as Renderer Service
+    participant WAL as Workpaper Authoring Service (WAL)
+    participant TMG as Template and Methodology Governance (TMG)
+    participant Prompt as Prompt Management Service
+    participant AgentReg as Agent Registry Service
+    participant AgentOrch as Agent Orchestrator
+    participant AgentRun as Agent Runtime
+    participant FuncReg as Function Registry and Tools
+    participant Memory as Common Memory Service
+    participant DataIF as Data Interface
+    participant Canonical as Canonical NoSQL DB
+    participant DocExport as Document Export Service
+    participant ObjectStore as Object Storage
+    participant EventBus as Central Event Bus
+    participant Audit as Immutable Audit Trail
+    participant Usage as Usage Analytics (Kibana)
+    participant Comment as Comment Service
+    participant Review as Review Workflow Service
+
+    %% 1. User logs in
+    User->>WebUI: 1. Click Login
+    WebUI->>Auth: 2. Send credentials
+    Auth->>Auth: 3. Validate credentials
+    Auth->>Session: 4. Issue session token and user context
+    Session-->>WebUI: 5. Return session token and context
+    WebUI-->>User: 6. Show authenticated UI
+
+    %% 2. Render specific workpaper version
+    User->>WebUI: 7. Request render of workpaper (docId, version, context)
+    WebUI->>Renderer: 8. Request render (docId, version, context)
+    Renderer->>WAL: 9. Fetch workpaper instance and version metadata
+    WAL->>WAL: 10. Retrieve versioned structured content
+    WAL->>TMG: 11. Request template schema and presentation model
+    TMG-->>Renderer: 12. Return template schema and layout
+    Renderer->>Renderer: 13. Apply schema, assemble view
+    Renderer-->>WebUI: 14. Return rendered page (versioned)
+    WebUI-->>User: 15. Display workpaper version
+
+    %% 3. User captures audit data via webforms into canonical data
+    User->>WebUI: 16. Fill webform fields (context: businessProcess, activity, subActivity)
+    WebUI->>WAL: 17. Save structured updates (documentId, version, user, context)
+    WAL->>WAL: 18. Create new immutable version (versionNumber++)
+    WAL->>WAL: 19. Persist version to WAL_DB
+    WAL->>EventBus: 20. Emit event WorkpaperVersionCreated (workpaperId, version)
+    EventBus->>Audit: 21. Append event to immutable audit trail
+    EventBus->>Usage: 22. Emit telemetry event (user action, time, context)
+    WebUI-->>User: 23. Confirm save and show new version
+
+    %% 4. User requests AI assistance for subsection
+    User->>WebUI: 24. Click "AI Assist" on subsection
+    WebUI->>Prompt: 25. Request prompt template selection (context)
+    Prompt-->>WebUI: 26. Return prompt template id and placeholders
+    WebUI->>AgentOrch: 27. Request prompt resolution (promptId, context, placeholders)
+    AgentOrch->>DataIF: 28. Query data by context (documentId, version, businessProcess)
+    DataIF->>Canonical: 29. Retrieve canonical data (fields, references)
+    Canonical-->>DataIF: 30. Return data
+    DataIF-->>AgentOrch: 31. Return resolved data
+    AgentOrch->>Prompt: 32. Fill placeholders in prompt template with resolved data
+    AgentOrch->>AgentRun: 33. Invoke agent runtime with resolved prompt (human-in-loop)
+    AgentRun->>FuncReg: 34. Call function/tool if needed (evidence assembly, lookups)
+    FuncReg-->>AgentRun: 35. Return tool outputs
+    AgentRun->>Memory: 36. Read/write session memory as needed
+    AgentRun-->>AgentOrch: 37. Return AI suggestion (draft text, summary)
+    AgentOrch-->>WebUI: 38. Present suggestion to user (editable, flagged AI)
+    WebUI-->>User: 39. Show AI suggestion for review
+
+    %% 5. User accepts AI suggestion and system saves changes
+    User->>WebUI: 40. Accept suggestion (or edit then accept)
+    WebUI->>WAL: 41. Save accepted changes as new version (AI-assisted flag)
+    WAL->>WAL: 42. Persist new version to WAL_DB
+    WAL->>EventBus: 43. Emit event AIAssistedVersionCreated (workpaperId, version, promptId)
+    EventBus->>Audit: 44. Append AI interaction event to audit trail
+    EventBus->>Usage: 45. Emit AI usage telemetry
+
+    %% 6. User requests AI agent to generate test plan
+    User->>WebUI: 46. Click "Generate Test Plan"
+    WebUI->>AgentReg: 47. Request agent instantiation (agent template: TestPlanAgent)
+    AgentReg-->>AgentOrch: 48. Register and instruct orchestrator to create agent
+    AgentOrch->>AgentRun: 49. Provision agent runtime (Langraph flow)
+    AgentRun->>DataIF: 50. Pull control and evidence data by context
+    AgentRun->>FuncReg: 51. Use MCP tools to assemble test steps
+    AgentRun->>Memory: 52. Store session context and partial outputs
+    AgentRun-->>AgentOrch: 53. Return proposed test plan (human-in-loop)
+    AgentOrch-->>WebUI: 54. Present test plan to user for review
+
+    %% 7. User finalizes and triggers document generation
+    User->>WebUI: 55. Click "Generate Document" (PDF/Word)
+    WebUI->>DocExport: 56. Request document generation (workpaperId, version, templateLayout)
+    DocExport->>Renderer: 57. Request canonical render for specified version
+    Renderer->>WAL: 58. Fetch versioned content
+    WAL-->>Renderer: 59. Return content
+    Renderer->>DocExport: 60. Return rendered artifact (PDF/Word)
+    DocExport->>ObjectStore: 61. Store artifact and compute integrity hash
+    ObjectStore-->>DocExport: 62. Return storage location and hash
+    DocExport->>EventBus: 63. Emit ExportCreated event (artifactId, hash)
+    EventBus->>Audit: 64. Append export event and integrity record
+    EventBus->>Usage: 65. Emit export telemetry
+
+    %% 8. User downloads and local save
+    WebUI->>ObjectStore: 66. Request artifact download (artifactId)
+    ObjectStore-->>WebUI: 67. Return artifact stream
+    WebUI-->>User: 68. Trigger local save (download)
+
+    %% 9. Collaboration events and review decisions
+    User->>Comment: 69. Add comment anchored to field/version
+    Comment->>EventBus: 70. Emit CommentAdded event
+    EventBus->>Audit: 71. Append comment event
+    User->>Review: 72. Submit review decision (approve / changes required)
+    Review->>WAL: 73. If changes required, request WAL to transition lifecycle
+    WAL->>EventBus: 74. Emit WorkpaperStatusChanged event
+    EventBus->>Audit: 75. Append status change event
+
+    %% 10. Analytics and dashboards
+    EventBus->>Usage: 76. Stream events for projections
+    Usage->>Usage: 77. Build KPIs and dashboards (Kibana)
+    Usage-->>Leadership: 78. Visualize metrics (rework cycles, AI adoption)
+
+    %% 11. End of flow
+    Note over Audit, Usage: All events are immutable and reconstructable for lineage and verification

@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation
+    participant GSAI as GS-AI Platform
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+
+    Auditor->>UI: Request AI Assistance (e.g., Draft Section, Summarize)
+    UI->>IAA: Invoke Orchestration (workpaperId, context, inputs, masked data)
+    IAA->>GAL: Log Prompt & Metadata (Before Invocation)
+    IAA->>GSAI: Call Governed Model (Enterprise API, No Retention)
+    GSAI-->>IAA: Return Suggestion (e.g., Draft Text)
+    IAA->>GAL: Log Output & Model Details
+    IAA-->>UI: Present Suggestion (Human-in-the-Loop)
+    Auditor->>UI: Review/Edit/Accept Suggestion
+    UI->>WAL: Save Accepted Changes as New Version
+    WAL->>EB: Emit Event (AIAssistedUpdate)
+    EB->>GAL: Log Full AI Interaction Event

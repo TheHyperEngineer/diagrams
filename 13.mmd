@@ -1,0 +1,51 @@
+sequenceDiagram
+    participant Auditor1 as Auditor 1
+    participant Auditor2 as Auditor 2 (Reviewer)
+    participant UI as Browser UI
+    participant CR as Collaboration & Review Domain
+    participant WAL as Workpaper Authoring & Lifecycle Domain
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+    participant DB as DynamoDB
+
+    Auditor1->>UI: Edit Workpaper Section (Parallel Editing)
+    UI->>WAL: Submit Edits (workpaperId, updates)
+    WAL->>DB: Create New Immutable Version
+    DB-->>WAL: Version Confirmed
+    WAL->>EB: Emit VersionUpdated Event
+    EB->>GAL: Log Edit Event (User, Timestamp, Changes)
+    EB->>CR: Notify for Presence Update
+    CR-->>UI: Show Presence (Auditor2 Sees Auditor1 Editing)
+
+    Auditor1->>UI: Assign Review to Auditor2
+    UI->>CR: Create Review Assignment (workpaperId, reviewer: Auditor2, state: In Review)
+    CR->>DB: Store Assignment Metadata
+    DB-->>CR: Confirmed
+    CR->>EB: Emit ReviewAssigned Event
+    EB->>GAL: Log Assignment Event
+    EB->>UI: Send Notification to Auditor2 (In-App/Email)
+
+    Auditor2->>UI: Add Threaded Comment (Anchored to Section/Field)
+    UI->>CR: Post Comment (workpaperId, section, commentText)
+    CR->>DB: Store Comment
+    DB-->>CR: Confirmed
+    CR->>EB: Emit CommentAdded Event
+    EB->>GAL: Log Comment Event
+    EB->>UI: Notify Auditor1 (Mention/Change)
+
+    Auditor1->>UI: Resolve Comment & Make Changes
+    UI->>CR: Update Comment State (Resolved)
+    CR->>EB: Emit CommentResolved Event
+    EB->>GAL: Log Resolution
+    UI->>WAL: Submit Rework Edits
+    WAL->>DB: Create Rework Version
+    WAL->>EB: Emit ReworkVersionUpdated Event
+    EB->>GAL: Log Rework
+
+    Auditor2->>UI: Approve Workpaper
+    UI->>CR: Update Review State (Approved)
+    CR->>WAL: Transition Lifecycle State (to Approved)
+    WAL->>EB: Emit StateChanged Event (Approved)
+    EB->>GAL: Log Approval
+    EB->>UI: Notify Auditor1 (Approval)
+    Note over CR,GAL: All Interactions Logged&#59; Supports Reconstruction & QA

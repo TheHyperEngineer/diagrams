@@ -1,0 +1,29 @@
+sequenceDiagram
+    participant Auditor1 as Auditor 1
+    participant Auditor2 as Auditor 2
+    participant UI as Browser UI
+    participant CR as Collaboration & Review
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+    participant EB as EventBridge
+    participant GAL as Governance, Audit Trail & Lineage
+
+    Auditor1->>UI: Edit Section/Field (Parallel Editing)
+    UI->>WAL: Save Changes (workpaperId, updates)
+    WAL->>DB: Create New Immutable Version
+    DB-->>WAL: Confirm Version
+    WAL->>EB: Emit Event (VersionUpdated)
+    EB->>GAL: Log Edit Event (Who, What, When)
+    EB->>CR: Trigger Presence Update
+    CR-->>UI: Update Presence Indicators (Auditor2 sees Auditor1 editing)
+    Auditor1->>UI: Add Threaded Comment (Anchored to Field)
+    UI->>CR: Post Comment (workpaperId, section, text)
+    CR->>DB: Store Comment Metadata
+    DB-->>CR: Confirm
+    CR->>EB: Emit Event (CommentAdded)
+    EB->>GAL: Log Comment Event
+    EB->>UI: Notify Auditor2 (In-App/Email for Mention)
+    Auditor2->>UI: Review & Respond to Comment
+    UI->>CR: Update Comment (Resolve/Reject)
+    CR->>EB: Emit Event (CommentResolved)
+    EB->>GAL: Log Resolution

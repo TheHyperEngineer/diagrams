@@ -1,0 +1,33 @@
+graph TB
+  subgraph "AWS Account / Region"
+    subgraph "VPC"
+      IGW[Internet Gateway]
+      ALB[ALB<br/>UI & API Front Door]
+      APIGW[API Gateway<br/>REST Auth]
+      subgraph "Private Subnets"
+        EKS[EKS Cluster<br/>Kubernetes]
+        NAT[NAT Gateway]
+        DB[DynamoDB<br/>Structured Content]
+        KDS[Kinesis<br/>Audit Events]
+        S3[S3<br/>Artifacts & Projections]
+        KMS[KMS<br/>Key Management]
+        CW[CloudWatch<br/>Logs & Metrics]
+      end
+    end
+  end
+
+  Auditors[Auditors / Reviewers<br/>Browser] -->|HTTPS| ALB
+  ALB --> APIGW
+  APIGW --> EKS
+  EKS --> DB
+  EKS --> KDS
+  EKS --> S3
+  EKS --> CW
+  EKS --> KMS
+  EKS --> NAT
+  style EKS fill:#bfb,stroke:#333
+  style DB fill:#ffb,stroke:#333
+  style KDS fill:#ffb,stroke:#333
+  style S3 fill:#ffb,stroke:#333
+  style KMS fill:#ffb,stroke:#333
+  style CW fill:#ffb,stroke:#333

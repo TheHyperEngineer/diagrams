@@ -1,0 +1,165 @@
+graph TD
+    subgraph AWS["AWS Account / Region (e.g., us-west-2)"]
+        subgraph VPC["VPC (Virtual Private Cloud)"]
+            subgraph PublicSubnets["Public Subnets"]
+                IGW[Internet Gateway] --> ALB["Application Load Balancer<br>Exposes UI APIs"]
+                ALB --> APIGW["API Gateway<br>REST Endpoints, Auth"]
+            end
+
+            subgraph PrivateSubnets["Private Subnets"]
+                subgraph EKSCluster["EKS Cluster (Kubernetes)"]
+                    ControlPlane["EKS Control Plane<br>Managed by AWS"]
+                    WorkerNodes["Worker Node Groups<br>EC2 Auto-Scaling Groups<br>Host Domain Pods & AI Agents"]
+                    WorkerNodes --> TMG[Template Governance Pod]
+                    WorkerNodes --> WAL[Authoring Lifecycle Pod]
+                    WorkerNodes --> CR[Collaboration Pod]
+                    WorkerNodes --> IAA["AI Orchestration Pod<br>Manages Micro-Agent Lifecycle & Invocations<br>Lambda Integrations for AI Calls"]
+                    WorkerNodes --> GAL[Audit Trail Pod]
+                    WorkerNodes --> UAO[Analytics Pod]
+                    WorkerNodes --> PCS["Platform Services Pod<br>Includes Shared Security, IAM, Observability"]
+                    WorkerNodes --> DataInterface["Data Interface Pod<br>Centralized Uniform Access to Internal Data Sources<br>e.g., Data Lake, HCM, SIMPL via APIs"]
+                    WorkerNodes --> MCPServer["MCP Server Pod<br>Server-Client Model for Tool Access<br>Handles External Tool Integrations"]
+                    WorkerNodes --> FunctionTools["Function Tools Pod<br>Registry of Callable Functions<br>e.g., Custom Scripts, APIs"]
+                    WorkerNodes --> MemoryStore["Memory Store Pod<br>Session Management & State Persistence<br>e.g., Redis or DynamoDB Extension"]
+                    subgraph MicroAIAgents["Micro-AI Agents (Deployed by Teams)"]
+                        Agent1["Micro-Agent Pod 1<br>Task-Specific: e.g., Evidence Validation Agent<br>Deployed by Audit Team A<br>Containerized, Independent Scaling"]
+                        Agent2["Micro-Agent Pod 2<br>Task-Specific: e.g., Risk Assessment Agent<br>Deployed by Risk Team B<br>Isolated Namespace, No Impact on Others"]
+                        AgentN["Micro-Agent Pod N<br>Task-Specific: e.g., Compliance Check Agent<br>Deployed by Future Teams<br>Modular & Extensible"]
+                    end
+                end
+
+                NAT[NAT Gateway] --> IGW
+
+                DB["DynamoDB<br>Managed NoSQL<br>Workpapers, Schemas, Metadata, Agent Sessions"]
+                KDS["Kinesis Data Streams<br>Append-Only Audit Events incl. Agent Interactions"]
+                S3["S3 Buckets<br>Immutable Exports, Logs, Projections, Agent Artifacts"]
+                Athena["Athena<br>Query Engine for S3 incl. Agent Metrics"]
+                QS["QuickSight<br>BI Dashboards incl. Agent Usage KPIs"]
+                EB["EventBridge<br>Event Bus & Rules for Agent Triggers/Notifications"]
+                CW["CloudWatch<br>Logs, Metrics, Alarms for Agents & Services"]
+                Cognito["Cognito<br>User Pools, Identity for Agent Access Control"]
+                KMS["KMS<br>Key Management for Agent Data Encryption"]
+
+                EKSCluster --> DB
+                EKSCluster --> KDS
+                EKSCluster --> S3
+                EKSCluster --> Athena
+                EKSCluster --> QS
+                EKSCluster --> EB
+                EKSCluster --> CW
+                EKSCluster --> Cognito
+                EKSCluster --> KMS
+            end
+
+            APIGW --> ALB
+            APIGW --> EKSCluster
+            EKSCluster --> NAT
+        end
+
+        subgraph ExtServices["External Services (Integrated)"]
+            GSAI["GS-AI Platform<br>Internal AI Models<br>Via VPC Endpoint or PrivateLink<br>Used by Micro-Agents for Inference"]
+            AB["AuditBoard/APEX<br>Via API/Events"]
+            GRC["GRC Platforms<br>Via API/Events"]
+            DL["Data Lake<br>Via S3/API<br>Accessed via Data Interface"]
+            HCM["HCM Systems<br>Via API<br>Accessed via Data Interface"]
+            SIMPL["SIMPL<br>Via API<br>Accessed via Data Interface"]
+            ExternalTools["External Tools/Services<br>Accessed via MCP Server-Client or Function Tools"]
+        end
+
+        EKSCluster -->|"Governed API Calls from Agents"| GSAI
+        EKSCluster -->|"Exports/Events via Integration Layer"| AB
+        EKSCluster -->|"Push Findings from Agents"| GRC
+        EKSCluster -->|"Pull Evidence via Data Interface"| DL
+        EKSCluster -->|"User Sync via Data Interface"| HCM
+        EKSCluster -->|"Data Exchange via Data Interface"| SIMPL
+        EKSCluster -->|"Tool Calls from Agents"| ExternalTools
+    end
+
+    subgraph Users["Users (External)"]
+        Auditors["Auditors / Reviewers<br>Browser Access, Invoke Agents via UI"]
+        Managers["Managers / Leadership<br>Browser Access, Monitor Agent Deployments"]
+        Teams["Development Teams<br>Deploy New Micro-Agents via CI/CD Pipelines"]
+    end
+
+    Auditors -->|"HTTPS, Agent Requests"| IGW
+    Managers -->|"HTTPS, Insights"| IGW
+    Teams -->|"Secure Deployment Channels"| IGW
+
+    %% Connections for AI Agents
+    IAA -->|"Orchestrates & Deploys"| Agent1
+    IAA -->|"Orchestrates & Deploys"| Agent2
+    IAA -->|"Orchestrates & Deploys"| AgentN
+    Agent1 -->|"Tool Access (Server-Client)"| MCPServer
+    Agent2 -->|"Tool Access (Server-Client)"| MCPServer
+    AgentN -->|"Tool Access (Server-Client)"| MCPServer
+    Agent1 -->|"Function Calls"| FunctionTools
+    Agent2 -->|"Function Calls"| FunctionTools
+    AgentN -->|"Function Calls"| FunctionTools
+    Agent1 -->|"Session Memory"| MemoryStore
+    Agent2 -->|"Session Memory"| MemoryStore
+    AgentN -->|"Session Memory"| MemoryStore
+    Agent1 -->|"Shared Security/RBAC"| PCS
+    Agent2 -->|"Shared Security/RBAC"| PCS
+    AgentN -->|"Shared Security/RBAC"| PCS
+    Agent1 -->|"Log Interactions"| GAL
+    Agent2 -->|"Log Interactions"| GAL
+    AgentN -->|"Log Interactions"| GAL
+    Agent1 -->|"Emit Telemetry"| EB
+    Agent2 -->|"Emit Telemetry"| EB
+    AgentN -->|"Emit Telemetry"| EB
+    DataInterface -->|"Proxy Calls"| DL
+    DataInterface -->|"Proxy Calls"| HCM
+    DataInterface -->|"Proxy Calls"| SIMPL
+    MCPServer -->|"Integrate"| ExternalTools
+    FunctionTools -->|"Invoke"| ExternalTools
+    MemoryStore -->|"Persist"| DB
+    Teams -->|"Deploy Without Impact<br>(Isolated Pods/Namespaces)"| WorkerNodes
+
+    %% Styles (Consistent with Original Diagrams)
+    style AWS fill:#eee,stroke:#333
+    style VPC fill:#eee,stroke:#333,stroke-dasharray:5 5
+    style PublicSubnets fill:#dfd,stroke:#333
+    style PrivateSubnets fill:#dfd,stroke:#333
+    style EKSCluster fill:#bfb,stroke:#333
+    style MicroAIAgents fill:#ddf,stroke:#333,stroke-dasharray:3 3
+    style ExtServices fill:#fdd,stroke:#333
+    style Users fill:#f9f,stroke:#333
+    style IGW fill:#ffb,stroke:#333
+    style ALB fill:#ffb,stroke:#333
+    style APIGW fill:#ffb,stroke:#333
+    style NAT fill:#ffb,stroke:#333
+    style ControlPlane fill:#bfb,stroke:#333
+    style WorkerNodes fill:#bfb,stroke:#333
+    style TMG fill:#dfd,stroke:#333
+    style WAL fill:#dfd,stroke:#333
+    style CR fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style PCS fill:#dfd,stroke:#333
+    style DataInterface fill:#dfd,stroke:#333
+    style MCPServer fill:#dfd,stroke:#333
+    style FunctionTools fill:#dfd,stroke:#333
+    style MemoryStore fill:#dfd,stroke:#333
+    style Agent1 fill:#ddf,stroke:#333
+    style Agent2 fill:#ddf,stroke:#333
+    style AgentN fill:#ddf,stroke:#333
+    style DB fill:#ffb,stroke:#333
+    style KDS fill:#ffb,stroke:#333
+    style S3 fill:#ffb,stroke:#333
+    style Athena fill:#ffb,stroke:#333
+    style QS fill:#ffb,stroke:#333
+    style EB fill:#ffb,stroke:#333
+    style CW fill:#ffb,stroke:#333
+    style Cognito fill:#ffb,stroke:#333
+    style KMS fill:#ffb,stroke:#333
+    style GSAI fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style ExternalTools fill:#fdd,stroke:#333
+    style Auditors fill:#f9f,stroke:#333
+    style Managers fill:#f9f,stroke:#333
+    style Teams fill:#f9f,stroke:#333

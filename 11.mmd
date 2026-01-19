@@ -1,0 +1,44 @@
+graph TD
+    subgraph "IA Meridian (Data Flows)"
+        WAL[Workpaper Authoring & Lifecycle<br>Structured Content, Versions, States]
+        IAA[Intelligent Assistance<br>AI Suggestions, Evidence Assembly]
+        GAL[Audit Trail & Lineage<br>Events, Hashes, Lineage Records]
+        UAO[Analytics & Insights<br>Metrics, KPIs from Projections]
+        INT["Integration Layer\nAPIs, Events, Exports (PDF/Word w/ Hashes)"]
+    end
+
+    subgraph "External Systems"
+        DL[Data Lake<br>Authoritative Evidence, Source Data]
+        AB[AuditBoard/APEX<br>Audit Management, Archival, Submissions]
+        GRC[GRC Platforms<br>Issue Management, Findings]
+        HCM[HCM Systems<br>User Data, Roles]
+        SIMPL[SIMPL<br>Audit Tools, Issues]
+        GSAI[GS-AI Platform<br>Governed Models]
+    end
+
+    DL -->|Pull Evidence/Data APIs| IAA
+    IAA -->|Assembled Data Masked| WAL
+    WAL -->|Structured Updates| GAL
+    WAL -->|Finalized Artifacts/Data| INT
+    INT -->|Export PDFs w/ Hashes Immutable| AB
+    INT -->|Push Findings/Status Events/APIs| GRC
+    INT -->|Data Exchange| SIMPL
+    HCM -->|Sync Users/Roles| INT
+    WAL -->|Telemetry/Events| UAO
+    GAL -->|Event Projections| UAO
+    IAA -->|Governed Calls Prompts/Outputs Logged| GSAI
+    GSAI -->|Suggestions| IAA
+    GAL -->|Lineage Links Sources to Exports| INT
+    INT -->|Integrity Verification Hashes| AB
+
+    style WAL fill:#dfd,stroke:#333
+    style IAA fill:#dfd,stroke:#333
+    style GAL fill:#dfd,stroke:#333
+    style UAO fill:#dfd,stroke:#333
+    style INT fill:#ffb,stroke:#333
+    style DL fill:#fdd,stroke:#333
+    style AB fill:#fdd,stroke:#333
+    style GRC fill:#fdd,stroke:#333
+    style HCM fill:#fdd,stroke:#333
+    style SIMPL fill:#fdd,stroke:#333
+    style GSAI fill:#fdd,stroke:#333

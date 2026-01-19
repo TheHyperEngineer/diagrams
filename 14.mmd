@@ -1,0 +1,30 @@
+sequenceDiagram
+    participant Auditor as Auditor
+    participant UI as Browser UI
+    participant IAA as Intelligent Assistance & Automation (Orchestrator)
+    participant GSAI as GS-AI Platform (Internal Models)
+    participant GAL as Governance, Audit Trail & Lineage
+    participant EB as EventBridge
+    participant WAL as Workpaper Authoring & Lifecycle
+    participant DB as DynamoDB
+
+    Auditor->>UI: Request AI Assistance (e.g., Generate Draft, Summarize, Gap Check)
+    UI->>IAA: Invoke AI Orchestration API (workpaperId, context: businessProcess/activity/subActivity, inputs, masked data)
+    IAA->>GAL: Log Pre-Invocation Event (Prompt Metadata, Model Selection, User)
+    IAA->>GSAI: Call Governed Enterprise API (Masked/Prompt, No Retention/Training Policy)
+    GSAI-->>IAA: Return AI Output (Suggestion, Model Metadata)
+    IAA->>GAL: Log Post-Invocation Event (Output, Decisions, Safety Checks)
+    IAA-->>UI: Present Suggestion as Editable Draft (Human Review Required)
+    Auditor->>UI: Review, Edit, Accept/Reject Suggestion
+    alt Accept
+        UI->>WAL: Save Accepted Changes (New Version, AI-Assisted Flag)
+        WAL->>DB: Store Updated Structured Content & Version
+        DB-->>WAL: Confirm
+        WAL->>EB: Emit Event (AIAssistedVersionCreated, Details)
+        EB->>GAL: Append Full AI Interaction Audit Trail
+    else Reject
+        UI->>IAA: Log Rejection (Feedback for Improvement)
+        IAA->>EB: Emit Event (AISuggestionRejected)
+        EB->>GAL: Append Rejection Event
+    end
+    Note over IAA,GAL: All Prompts/Outputs Logged&#59; Human-in-Loop Enforced&#59; No Auto-Commit
