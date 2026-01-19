@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-01-19T23:00:00.000Z" agent="IA-Meridian-Swimlane-Generator" etag="4">
+  <diagram name="Swimlanes User Flow" id="swimlanes-user-flow">
+    <mxGraphModel dx="1600" dy="1400" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="IA Meridian Swimlane Flow: User to Export with AI Agents and Event Bus" style="text;html=1;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="1560" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="swim" value="" style="swimlane;horizontal=0;startSize=30;childLayout=stackLayout;recursiveResize=0;container=1;collapsible=0;rounded=0;whiteSpace=wrap;html=1;fillColor=#f8fafc;strokeColor=#cbd5e1" vertex="1" parent="1">
+          <mxGeometry x="20" y="50" width="1560" height="1060" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_user" value="User" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="swim">
+          <mxGeometry x="0" y="0" width="1560" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_presentation" value="Presentation" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#e8f8ff;strokeColor=#2b6cb0" vertex="1" parent="swim">
+          <mxGeometry x="0" y="120" width="1560" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_auth" value="Auth and Session" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#2b6cb0" vertex="1" parent="swim">
+          <mxGeometry x="0" y="260" width="1560" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_workpaper" value="Workpaper Services" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="swim">
+          <mxGeometry x="0" y="380" width="1560" height="220" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_ai" value="AI and Agents" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#97266d" vertex="1" parent="swim">
+          <mxGeometry x="0" y="600" width="1560" height="200" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_collab" value="Collaboration and Review" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#38a169" vertex="1" parent="swim">
+          <mxGeometry x="0" y="800" width="1560" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="lane_data" value="Data Plane and Integrations" style="swimlane;horizontal=1;startSize=30;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="swim">
+          <mxGeometry x="0" y="940" width="1560" height="170" as="geometry"/>
+        </mxCell>
+        <mxCell id="user_icon" value="User (Auditor and Reviewer)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="lane_user">
+          <mxGeometry x="20" y="40" width="220" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="web_ui" value="Web UI\n- Login\n- Workpaper Viewer\n- Webforms\n- AI Assistance Buttons\n- Export Button" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ff;strokeColor=#2b6cb0" vertex="1" parent="lane_presentation">
+          <mxGeometry x="20" y="30" width="420" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="render_view" value="Renderer\n- Apply Template Schema\n- Render specific version" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ff;strokeColor=#2b6cb0" vertex="1" parent="lane_presentation">
+          <mxGeometry x="460" y="30" width="360" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="ai_buttons" value="AI Controls\n- Request Assistance\n- Generate Test Plan" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ff;strokeColor=#2b6cb0" vertex="1" parent="lane_presentation">
+          <mxGeometry x="840" y="30" width="320" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="export_button" value="Export Button\n- Choose PDF or Word" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f8ff;strokeColor=#2b6cb0" vertex="1" parent="lane_presentation">
+          <mxGeometry x="1180" y="30" width="320" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="auth_service" value="Auth Service\n- Authenticate\n- Issue Token" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#2b6cb0" vertex="1" parent="lane_auth">
+          <mxGeometry x="20" y="20" width="360" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="session_service" value="Session Service\n- Session State\n- User Context" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#2b6cb0" vertex="1" parent="lane_auth">
+          <mxGeometry x="400" y="20" width="360" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="auth_db" value="Auth DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_auth">
+          <mxGeometry x="780" y="20" width="220" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="tmg_service" value="TMG Service\n- Template Schema Store\nDB: TMG_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="20" y="20" width="320" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="wal_service" value="WAL Service\n- Workpaper Instances\n- Versioning\nDB: WAL_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="360" y="20" width="320" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="render_service" value="Render Service\n- Render PDF/Word from version" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="700" y="20" width="320" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="wal_db" value="WAL_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="360" y="110" width="320" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="tmg_db" value="TMG_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="20" y="110" width="320" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="render_db" value="RENDER_CACHE_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_workpaper">
+          <mxGeometry x="700" y="110" width="320" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="prompt_service" value="Prompt Management\n- Prompt Templates\n- Placeholder Resolution\nDB: PROMPT_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fff2;strokeColor=#2f855a" vertex="1" parent="lane_ai">
+          <mxGeometry x="20" y="20" width="360" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="agent_orchestrator" value="Agent Orchestrator\n- Create Agent\n- Langraph Flow\n- Human in Loop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#9f2b6b" vertex="1" parent="lane_ai">
+          <mxGeometry x="400" y="20" width="360" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="agent_runtime" value="Agent Runtime\n- Execute Steps\n- Call Tools and Data Interfaces" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#2f855a" vertex="1" parent="lane_ai">
+          <mxGeometry x="780" y="20" width="360" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="prompt_db" value="PROMPT_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_ai">
+          <mxGeometry x="20" y="110" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="agent_reg_db" value="AGENT_REG_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_ai">
+          <mxGeometry x="400" y="110" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="memory_db" value="MEMORY_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_ai">
+          <mxGeometry x="780" y="110" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="comment_service" value="Comment Service\n- Anchor to Field and Version\nDB: COMMENT_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="lane_collab">
+          <mxGeometry x="20" y="20" width="360" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="presence_service" value="Presence Service\n- Live Indicators\nDB: PRESENCE_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="lane_collab">
+          <mxGeometry x="420" y="20" width="360" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="review_service" value="Review Workflow\n- Assign and Record Decisions\nDB: REVIEW_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="lane_collab">
+          <mxGeometry x="820" y="20" width="360" height="64" as="geometry"/>
+        </mxCell>
+        <mxCell id="comment_db" value="COMMENT_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_collab">
+          <mxGeometry x="20" y="90" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="review_db" value="REVIEW_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e;fontSize=11" vertex="1" parent="lane_collab">
+          <mxGeometry x="820" y="90" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="canonical_db" value="Canonical NoSQL DB\n- Data by context: businessProcess, activity, subActivity, documentId, user, version\nDB: CANONICAL_DB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="lane_data">
+          <mxGeometry x="20" y="20" width="520" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="object_store" value="Object Storage\n- Artifacts and Exports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#b83280" vertex="1" parent="lane_data">
+          <mxGeometry x="560" y="20" width="360" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="event_stream" value="Event Stream\n- High throughput events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="lane_data">
+          <mxGeometry x="960" y="20" width="360" height="84" as="geometry"/>
+        </mxCell>
+        <mxCell id="audit_db_small" value="AUDIT_DB (Immutable)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f;fontSize=11" vertex="1" parent="lane_data">
+          <mxGeometry x="20" y="120" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="usage_proj" value="Usage Projections\n- Kibana Dashboards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="lane_data">
+          <mxGeometry x="400" y="120" width="360" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="external_integrations" value="External Integrations\n- AuditBoard, GRC, Data Lake" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" vertex="1" parent="lane_data">
+          <mxGeometry x="780" y="120" width="540" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="central_event_bus" value="Central Event Bus\n- Publish / Subscribe\n- Routing Rules" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f;fontSize=12" vertex="1" parent="swim">
+          <mxGeometry x="560" y="480" width="440" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2b6cb0;endArrow=block" edge="1" parent="swim" source="user_icon" target="web_ui">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2b6cb0;endArrow=block" edge="1" parent="swim" source="web_ui" target="auth_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2b6cb0;endArrow=block" edge="1" parent="swim" source="auth_service" target="session_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="web_ui" target="render_view">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="render_view" target="wal_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="wal_service" target="tmg_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="swim" source="web_ui" target="wal_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="swim" source="wal_db" target="canonical_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="swim" source="ai_buttons" target="agent_orchestrator">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="agent_orchestrator" target="prompt_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="prompt_service" target="data_interface">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="data_interface" target="canonical_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9f2b6b;endArrow=block" edge="1" parent="swim" source="ai_buttons" target="agent_orchestrator">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9f2b6b;endArrow=block" edge="1" parent="swim" source="agent_orchestrator" target="agent_runtime">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="swim" source="agent_runtime" target="function_registry">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="swim" source="agent_runtime" target="memory">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="swim" source="agent_runtime" target="data_interface">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e18" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="swim" source="agent_runtime" target="iaa">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="swim" source="iaa" target="web_ui">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="swim" source="web_ui" target="wal_db">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="swim" source="wal_service" target="central_event_bus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b83280;endArrow=block" edge="1" parent="swim" source="web_ui" target="doc_export">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b83280;endArrow=block" edge="1" parent="swim" source="doc_export" target="object_store">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b83280;endArrow=block" edge="1" parent="swim" source="doc_export" target="local_export">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="swim" source="central_event_bus" target="audit_trail">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="swim" source="web_ui" target="usage_analytics">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="swim" source="central_event_bus" target="usage_analytics">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#38a169;endArrow=block" edge="1" parent="swim" source="comment_service" target="central_event_bus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#38a169;endArrow=block" edge="1" parent="swim" source="review_service" target="wal_service">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="legend" value="Legend: arrows show primary flow; each service has its own DB box; events flow via Central Event Bus to Audit Trail and Usage Analytics" style="text;html=1;fontSize=11" vertex="1" parent="swim">
+          <mxGeometry x="20" y="1120" width="1560" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

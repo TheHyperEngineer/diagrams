@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-01-19T22:00:00.000Z" agent="IA-Meridian-Generator" etag="2">
+  <!-- Page 1: Microservices (detailed) -->
+  <diagram name="Microservices - Detailed" id="microservices-detailed">
+    <mxGraphModel dx="1600" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- Title -->
+        <mxCell id="title" value="IA Meridian - Microservices (Detailed)" style="text;html=1;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="20" y="10" width="1360" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Row A: Governance and Template -->
+        <mxCell id="TMG" value="TMG - Template and Methodology Governance" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="1">
+          <mxGeometry x="40" y="60" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="PromptMgmt" value="Prompt Management Subdomain\n- Prompt Templates\n- Prompt Store\n- Prompt Policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fff2;strokeColor=#2f855a" vertex="1" parent="1">
+          <mxGeometry x="420" y="60" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Row B: Authoring and Collaboration -->
+        <mxCell id="WAL" value="WAL - Workpaper Authoring and Lifecycle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="CR" value="CR - Collaboration and Review\n- Commenting Service\n- Presence Service\n- Review Workflow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#38a169" vertex="1" parent="1">
+          <mxGeometry x="420" y="170" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Row C: AI and Agents -->
+        <mxCell id="IAA" value="IAA - Intelligent Assistance and Automation\n- Agent Orchestrator\n- Prompt Execution Engine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#97266d" vertex="1" parent="1">
+          <mxGeometry x="40" y="280" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="AgentRegistry" value="Agent Registry and Catalog\n- Agent Metadata\n- Deployment Policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#9f2b6b" vertex="1" parent="1">
+          <mxGeometry x="420" y="280" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Row D: Audit, Analytics, Platform -->
+        <mxCell id="GAL" value="GAL - Governance, Audit Trail and Lineage\n- Append-only Event Ingest\n- Integrity Hashing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1">
+          <mxGeometry x="40" y="390" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="UAO" value="UAO - Usage Analytics and Insights\n- Projections and Dashboards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1">
+          <mxGeometry x="420" y="390" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="PCS" value="PCS - Platform and Cross-Cutting Services\n- Auth and Identity\n- Secrets and Keys\n- Observability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7f7ff;strokeColor=#5a67d8" vertex="1" parent="1">
+          <mxGeometry x="800" y="390" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Row E: Document Export and Function Registry -->
+        <mxCell id="DocExport" value="Document Export and Generation\n- Export Queue\n- Render Worker\n- Integrity Hash Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#b83280" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="FunctionRegistry" value="Function Registry and Tools\n- Function Catalog\n- Function Sandbox\n- Tool Adapter Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1">
+          <mxGeometry x="420" y="500" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="MemoryStore" value="Memory Store and Session State\n- Short Term Memory\n- Long Term Memory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1">
+          <mxGeometry x="800" y="500" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Data Plane (compact reference) -->
+        <mxCell id="DataPlaneRef" value="Data Plane (NoSQL, Object Storage, Event Stream)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1">
+          <mxGeometry x="800" y="60" width="360" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors: clear, non-overlapping -->
+        <mxCell id="c_tmg_prompt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1" source="TMG" target="PromptMgmt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_wal_cr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1" source="WAL" target="CR">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_wal_docexport" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b83280;endArrow=block" edge="1" parent="1" source="WAL" target="DocExport">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_iaa_agentreg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9f2b6b;endArrow=block" edge="1" parent="1" source="IAA" target="AgentRegistry">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_iaa_prompt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="1" source="IAA" target="PromptMgmt">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_docexport_event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1" source="DocExport" target="GAL">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_gal_uao" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1" source="GAL" target="UAO">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_function_memory" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1" source="FunctionRegistry" target="MemoryStore">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_pcs_all" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5a67d8;endArrow=block" edge="1" parent="1" source="PCS" target="TMG">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_pcs_wal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#5a67d8;endArrow=block" edge="1" parent="1" source="PCS" target="WAL">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_prompt_docexport" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1" source="PromptMgmt" target="DocExport">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend: Governance (green), Collaboration (light green), AI (pink), Audit and Analytics (yellow), Platform (blue), Exports and Tools (orange)" style="text;html=1;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="40" y="600" width="1120" height="40" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- Page 2: AI Agents Architecture -->
+  <diagram name="AI Agents Architecture" id="ai-agents-architecture">
+    <mxGraphModel dx="1400" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0a"/>
+        <mxCell id="1a" parent="0a"/>
+
+        <mxCell id="title_agents" value="AI Agents Architecture" style="text;html=1;fontSize=14;fontStyle=1" vertex="1" parent="1a">
+          <mxGeometry x="20" y="10" width="1360" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- CI/CD and Registry -->
+        <mxCell id="CI" value="CI/CD Pipeline\n- Build Image\n- Tests\n- Publish Image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1a">
+          <mxGeometry x="40" y="60" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="AgentReg" value="Agent Registry\n- Metadata\n- Versioning\n- Policies" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#9f2b6b" vertex="1" parent="1a">
+          <mxGeometry x="400" y="60" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Orchestrator" value="Agent Orchestrator\n- Schedule\n- Rollout\n- Health" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#97266d" vertex="1" parent="1a">
+          <mxGeometry x="760" y="60" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Runtime and Isolation -->
+        <mxCell id="AgentRuntime" value="Agent Runtime\n- Containerized Pod\n- Resource Limits\n- Sidecar for Telemetry" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#2f855a" vertex="1" parent="1a">
+          <mxGeometry x="40" y="180" width="520" height="120" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ToolAdapter" value="Tool Adapter and Function Invoker\n- Server Client Adapter\n- Function Registry Calls" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1a">
+          <mxGeometry x="580" y="180" width="500" height="120" as="geometry"/>
+        </mxCell>
+
+        <!-- Model Calls and Prompt Flow -->
+        <mxCell id="PromptSvc" value="Prompt Execution Flow\n- Prompt Templates\n- Masking and Minimization\n- Prompt Policy Enforcement" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fff2;strokeColor=#2f855a" vertex="1" parent="1a">
+          <mxGeometry x="40" y="320" width="520" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ModelPlatform" value="Internal Model Platform\n- Governed Models\n- No External Training" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#2f855a" vertex="1" parent="1a">
+          <mxGeometry x="580" y="320" width="500" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Memory and Audit -->
+        <mxCell id="AgentMemory" value="Agent Memory and Session Store\n- Short Term Session\n- Long Term Memory" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1a">
+          <mxGeometry x="40" y="440" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="AgentAudit" value="Agent Audit and Telemetry\n- Emit Events\n- Health Metrics\n- Logs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1a">
+          <mxGeometry x="400" y="440" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors -->
+        <mxCell id="c_ci_reg" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#333;endArrow=block" edge="1" parent="1a" source="CI" target="AgentReg">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_reg_orch" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#9f2b6b;endArrow=block" edge="1" parent="1a" source="AgentReg" target="Orchestrator">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_orch_runtime" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="1a" source="Orchestrator" target="AgentRuntime">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_runtime_tool" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1a" source="AgentRuntime" target="ToolAdapter">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_runtime_prompt" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1a" source="AgentRuntime" target="PromptSvc">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_prompt_model" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1a" source="PromptSvc" target="ModelPlatform">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_runtime_memory" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1a" source="AgentRuntime" target="AgentMemory">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_runtime_audit" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1a" source="AgentRuntime" target="AgentAudit">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- Page 3: Event Bus and Collaboration -->
+  <diagram name="Event Bus and Collaboration" id="eventbus-collab">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0e"/>
+        <mxCell id="1e" parent="0e"/>
+
+        <mxCell id="title_event" value="Event Bus and Collaboration" style="text;html=1;fontSize=14;fontStyle=1" vertex="1" parent="1e">
+          <mxGeometry x="20" y="10" width="1360" height="28" as="geometry"/>
+        </mxCell>
+
+        <!-- Central Event Bus -->
+        <mxCell id="EventBus" value="Central Event Bus\n- Publish / Subscribe\n- Event Rules and Routing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f;fontSize=12" vertex="1" parent="1e">
+          <mxGeometry x="520" y="60" width="360" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- Producers -->
+        <mxCell id="WAL_prod" value="WAL (Workpaper Authoring)\n- VersionUpdated\n- LifecycleChanged" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dff6e9;strokeColor=#2f855a" vertex="1" parent="1e">
+          <mxGeometry x="40" y="200" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="CR_prod" value="CR (Collaboration)\n- CommentAdded\n- ReviewDecision" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#38a169" vertex="1" parent="1e">
+          <mxGeometry x="40" y="320" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="IAA_prod" value="IAA (AI Interactions)\n- AISuggestionEmitted\n- AISuggestionAccepted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#97266d" vertex="1" parent="1e">
+          <mxGeometry x="40" y="440" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Consumers -->
+        <mxCell id="GAL_cons" value="GAL (Audit Trail)\n- Append Events\n- Lineage" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1e">
+          <mxGeometry x="920" y="200" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="UAO_cons" value="UAO (Analytics)\n- Projections\n- KPIs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1e">
+          <mxGeometry x="920" y="320" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="External_cons" value="External Systems\n- AuditBoard\n- GRC\n- Data Lake" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" vertex="1" parent="1e">
+          <mxGeometry x="920" y="440" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Collaboration subservices -->
+        <mxCell id="CommentSvc" value="Commenting Service\n- Anchor to Field/Version" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1e">
+          <mxGeometry x="380" y="200" width="120" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="PresenceSvc" value="Presence Service\n- Live Indicators" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1e">
+          <mxGeometry x="380" y="300" width="120" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ReviewSvc" value="Review Workflow Service\n- Assignments and Decisions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1e">
+          <mxGeometry x="380" y="400" width="120" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors: producers -> event bus -->
+        <mxCell id="c_wal_event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1e" source="WAL_prod" target="EventBus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_cr_event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#38a169;endArrow=block" edge="1" parent="1e" source="CR_prod" target="EventBus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_iaa_event" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#97266d;endArrow=block" edge="1" parent="1e" source="IAA_prod" target="EventBus">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors: event bus -> consumers -->
+        <mxCell id="c_event_gal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1e" source="EventBus" target="GAL_cons">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_event_uao" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1e" source="EventBus" target="UAO_cons">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_event_external" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1e" source="EventBus" target="External_cons">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Collaboration internal flows -->
+        <mxCell id="c_comment_cr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1e" source="CommentSvc" target="CR_prod">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_presence_cr" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1e" source="PresenceSvc" target="CR_prod">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_review_wal" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1e" source="ReviewSvc" target="WAL_prod">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- Page 4: Data Plane and Integrations -->
+  <diagram name="Data Plane and Integrations" id="dataplane-integrations">
+    <mxGraphModel dx="1400" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000">
+      <root>
+        <mxCell id="0d"/>
+        <mxCell id="1d" parent="0d"/>
+
+        <mxCell id="title_dp" value="Data Plane and Integrations" style="text;html=1;fontSize=14;fontStyle=1" vertex="1" parent="1d">
+          <mxGeometry x="20" y="10" width="1360" height="28" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="NoSQL" value="NoSQL Database\n- Workpaper Documents\n- Version Indexes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1d">
+          <mxGeometry x="40" y="60" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="EventStream" value="Event Stream\n- Append-only Audit Events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1d">
+          <mxGeometry x="480" y="60" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ObjectStore" value="Object Storage\n- Artifacts and Exports" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#b83280" vertex="1" parent="1d">
+          <mxGeometry x="920" y="60" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Projections" value="Projections and Query Engine\n- Aggregations for Dashboards" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" vertex="1" parent="1d">
+          <mxGeometry x="40" y="200" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Monitoring" value="Monitoring and Logging\n- Central Logs and Metrics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#718096" vertex="1" parent="1d">
+          <mxGeometry x="480" y="200" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Integrity" value="Integrity and Hash Service\n- Export Hashes\n- Verification APIs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" vertex="1" parent="1d">
+          <mxGeometry x="920" y="200" width="420" height="100" as="geometry"/>
+        </mxCell>
+
+        <!-- External Integrations -->
+        <mxCell id="AuditBoard" value="AuditBoard and APEX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" vertex="1" parent="1d">
+          <mxGeometry x="40" y="340" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="GRC" value="GRC Platforms" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" vertex="1" parent="1d">
+          <mxGeometry x="400" y="340" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="DataLake" value="Data Lake (External)\n- Long Term Evidence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" vertex="1" parent="1d">
+          <mxGeometry x="760" y="340" width="320" height="84" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="InternalAI" value="Internal AI Platform\n- Model Hosting" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#2f855a" vertex="1" parent="1d">
+          <mxGeometry x="1120" y="340" width="220" height="84" as="geometry"/>
+        </mxCell>
+
+        <!-- Connectors -->
+        <mxCell id="c_wal_nosql_dp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1d" source="NoSQL" target="Projections">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_eventstream_object_dp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1d" source="EventStream" target="ObjectStore">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_object_datalake_dp" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b83280;endArrow=block" edge="1" parent="1d" source="ObjectStore" target="DataLake">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_integrity_auditboard" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#d69e2e;endArrow=block" edge="1" parent="1d" source="Integrity" target="AuditBoard">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_eventstream_grc" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#b7791f;endArrow=block" edge="1" parent="1d" source="EventStream" target="GRC">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="c_internalai_model" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2f855a;endArrow=block" edge="1" parent="1d" source="InternalAI" target="EventStream">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

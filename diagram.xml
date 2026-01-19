@@ -1,0 +1,127 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.3.3">
+  <diagram name="IA Meridian - CF Topology" id="ia-meridian-cf">
+    <mxGraphModel dx="1426" dy="743" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="vpcGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3f6ff;strokeColor=#2b6cb0;fontSize=12;fontStyle=1" value="VPC: IA-Meridian-VPC" vertex="1">
+          <mxGeometry height="520" width="820" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="igw" parent="vpcGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#b7791f" value="Internet Gateway" vertex="1">
+          <mxGeometry height="60" width="140" x="40" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="publicSubnet" parent="vpcGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6ffed;strokeColor=#2f855a" value="Public Subnet" vertex="1">
+          <mxGeometry height="160" width="360" x="40" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="alb" parent="publicSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#c53030" value="ALB (IA-Meridian-ALB)\n- HTTPS front door" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="albTG" parent="publicSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#dd6b20" value="ALB Target Group\n(IA-Meridian-TG)" vertex="1">
+          <mxGeometry height="40" width="320" x="20" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="apigw" parent="publicSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ebf8ff;strokeColor=#2b6cb0" value="API Gateway (IA-Meridian-API)" vertex="1">
+          <mxGeometry height="60" width="320" x="420" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" edge="1" parent="publicSubnet" source="alb" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="albTG">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" edge="1" parent="publicSubnet" source="apigw" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="eks">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="privateSubnet" parent="vpcGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6f6ff;strokeColor=#2b6cb0" value="Private Subnet" vertex="1">
+          <mxGeometry height="360" width="360" x="420" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="eks" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6fffa;strokeColor=#2c7a7b" value="EKS Cluster (IA-Meridian-EKS)" vertex="1">
+          <mxGeometry height="120" width="320" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="nodegroup" parent="eks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#38a169" value="EKS NodeGroup\n(ia-meridian-nodegroup)" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="dynamo" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" value="DynamoDB Table\nIAWorkpapers" vertex="1">
+          <mxGeometry height="60" width="160" x="20" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="kinesis" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" value="Kinesis Data Stream\nIA-Audit-Stream" vertex="1">
+          <mxGeometry height="60" width="160" x="200" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="s3" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f7;strokeColor=#b83280" value="S3 Bucket\nia-meridian-artifacts-*" vertex="1">
+          <mxGeometry height="60" width="160" x="380" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="eventbus" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" value="EventBridge\nIAEventBus" vertex="1">
+          <mxGeometry height="60" width="160" x="720" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="cognito" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0f9ff;strokeColor=#2b6cb0" value="Cognito User Pool\nIAUserPool" vertex="1">
+          <mxGeometry height="60" width="160" x="20" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="kms" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#b7791f" value="KMS Key\nIA Meridian Key" vertex="1">
+          <mxGeometry height="60" width="160" x="200" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="lambda" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7f7ff;strokeColor=#5a67d8" value="Lambda: IA-AI-Orchestrator" vertex="1">
+          <mxGeometry height="60" width="160" x="380" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="cwLogs" parent="privateSubnet" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffaf0;strokeColor=#718096" value="CloudWatch LogGroups\n- /aws/lambda/IA-AI-Orchestrator\n- /aws/apigateway/ia-meridian-prod" vertex="1">
+          <mxGeometry height="60" width="160" x="560" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" edge="1" parent="privateSubnet" source="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="dynamo">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" edge="1" parent="privateSubnet" source="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="kinesis">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" edge="1" parent="privateSubnet" source="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c7" edge="1" parent="privateSubnet" source="eks" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="eventbus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c8" edge="1" parent="privateSubnet" source="lambda" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="eventbus">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c13" edge="1" parent="privateSubnet" source="cognito" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="apigw">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c14" edge="1" parent="privateSubnet" source="kms" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c15" edge="1" parent="privateSubnet" source="cwLogs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="lambda">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="externalGroup" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff5f0;strokeColor=#c05621;fontSize=12;fontStyle=1" value="External Integrations" vertex="1">
+          <mxGeometry height="420" width="360" x="1020" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="auditboard" parent="externalGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" value="AuditBoard / APEX" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="grc" parent="externalGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" value="GRC Platforms" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="datalake" parent="externalGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff0f6;strokeColor=#97266d" value="Data Lake (S3 / DL)" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="gsai" parent="externalGroup" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0fff4;strokeColor=#2f855a" value="GS-AI Platform\n(Internal Models)" vertex="1">
+          <mxGeometry height="60" width="320" x="20" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="c9" edge="1" parent="externalGroup" source="s3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="datalake">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c10" edge="1" parent="externalGroup" source="eventbus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="auditboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c11" edge="1" parent="externalGroup" source="eventbus" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="grc">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="c12" edge="1" parent="externalGroup" source="lambda" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="gsai">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="users" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff7ed;strokeColor=#d69e2e" value="Users: Auditors / Managers\n(Browser)" vertex="1">
+          <mxGeometry height="60" width="160" x="40" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" edge="1" parent="1" source="users" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333" target="alb">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="labelInfra" parent="1" style="text;html=1;fontSize=12;fontStyle=1" value="Core Infra (VPC, Subnets, ALB, API GW, EKS, Data Plane)" vertex="1">
+          <mxGeometry height="30" width="820" x="220" y="550" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
