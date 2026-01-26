@@ -1,0 +1,46 @@
+graph LR
+    subgraph "Persistent State Layer (PostgreSQL JSONB)"
+        SharedState[("Shared Workflow State\n{ inputs, plan, results, errors, human_feedback }")]
+    end
+
+    subgraph "LangGraph4j Runtime"
+        Start((Start)) --> Node_Plan
+        
+        subgraph "Agent A: Planner"
+            Node_Plan[("Planning Agent")]
+            Prompt_Plan[("Prompt: Methodology Strategist")]
+            Tools_Meta[("Tool: Schema Registry")]
+            
+            Node_Plan -- reads/writes --> SharedState
+            Node_Plan -. uses .- Prompt_Plan
+            Node_Plan -. uses .- Tools_Meta
+        end
+        
+        Node_Plan --> Router_A{Plan Valid?}
+        Router_A -- No (Critique) --> Node_Plan
+        Router_A -- Yes --> Checkpoint_Human
+        
+        subgraph "Human Interaction"
+            Checkpoint_Human[("State Checkpoint\n(SUSPENDED)")]
+            Human_Action[("Auditor Approval")]
+            
+            SharedState -. rehydrates .-> Checkpoint_Human
+            Human_Action --> Checkpoint_Human
+        end
+        
+        Checkpoint_Human --> Node_Exec
+        
+        subgraph "Agent B: Executor"
+            Node_Exec[("Execution Agent")]
+            Prompt_Exec[("Prompt: Data Analyst")]
+            Tools_Data[("Tool: AuditBoard / SQL")]
+            
+            Node_Exec -- reads/writes --> SharedState
+            Node_Exec -. uses .- Prompt_Exec
+            Node_Exec -. uses .- Tools_Data
+        end
+        
+        Node_Exec --> Router_B{Data Sufficient?}
+        Router_B -- No (Missing Info) --> Node_Exec
+        Router_B -- Yes --> End((End))
+    end

@@ -1,0 +1,83 @@
+sequenceDiagram
+    autonumber
+    participant U as Auditor (Browser)
+    participant API as Controller
+    participant SESS as Session Manager
+    participant ORCH as LangGraph Runtime
+    participant STATE as State Repo (Postgres)
+    participant PRMT as Prompt Service
+    participant MEM as Vector Store (RAG)
+    participant PLAN as Planner Agent (Bean)
+    participant EXEC as Executor Agent (Bean)
+    participant GATE as Auth LLM Gateway
+    participant MCP as MCP Client Manager
+
+    box "Initialization Phase" #f9f9f9
+    U->>API: POST /workflow/control-test {controlId: "C-504"}
+    API->>SESS: Validate Token & Get User Context (Role, Div)
+    SESS-->>API: ContextObj {User: "Auditor_J", Role: "Mgr"}
+    API->>ORCH: Initialize Workflow(Type: CONTROL_TEST)
+    ORCH->>STATE: Create Instance (Status: RUNNING)
+    end
+
+    box "Planning Phase (Agentic)" #e6f3ff
+    ORCH->>PLAN: Invoke Step: "GeneratePlan"
+    
+    rect rgb(240, 248, 255)
+        note right of PLAN: Context Injection
+        PLAN->>PRMT: Fetch "Plan_Gen_Prompt" (Ver: 1.2)
+        PRMT-->>PLAN: Template
+        PLAN->>MEM: Retrieve RAG Context (Methodology, C-504 History)
+        MEM-->>PLAN: Vector Chunks
+    end
+
+    PLAN->>MCP: Call Tool: GetControlDefinition("C-504")
+    MCP-->>PLAN: {Type: "AccessReview", Frequency: "Monthly"}
+
+    rect rgb(255, 240, 240)
+        note right of PLAN: Secure Inference
+        PLAN->>GATE: POST /chat/completions (Prompt + Context + ToolData)
+        note right of GATE: 1. PII Scan<br/>2. Cost Tagging<br/>3. Inject Certs
+        GATE->>External_LLM: Request
+        External_LLM-->>GATE: Response
+        GATE-->>PLAN: JSON Plan {Steps: ["Check JIRA", "Check AD"]}
+    end
+
+    PLAN-->>ORCH: Return State Update (Plan Object)
+    end
+
+    box "Suspension & Human Review" #fff0f5
+    ORCH->>STATE: Serialize State & LOCK (Status: SUSPENDED)
+    ORCH-->>API: 202 Accepted (WorkflowID)
+    API-->>U: "Plan Ready for Review"
+    
+    note over U, API: ... User Reviews & Clicks Approve ...
+    
+    U->>API: POST /workflow/{id}/approve
+    API->>ORCH: Resume Workflow
+    ORCH->>STATE: Rehydrate State (Load JSONB)
+    end
+
+    box "Execution Phase (Looping)" #e6ffe6
+    ORCH->>EXEC: Invoke Step: "ExecuteTest"
+    
+    loop For Each Step in Plan
+        EXEC->>GATE: Determine Tool Call (Reasoning)
+        GATE-->>EXEC: "Call Tool: SQL_Query"
+        
+        EXEC->>MCP: Execute Tool (Query: "SELECT * FROM tickets...")
+        MCP-->>EXEC: Result Set (15 Rows)
+        
+        EXEC->>STATE: Update Intermediate Results
+    end
+    
+    EXEC->>GATE: Generate Final Conclusion (Pass/Fail)
+    GATE-->>EXEC: "Fail: 3 Tickets Missing Approval"
+    EXEC-->>ORCH: Workflow Complete
+    end
+
+    box "Finalization" #f9f9f9
+    ORCH->>STATE: Persist Final State (Status: COMPLETED)
+    ORCH-->>API: Event: WorkflowFinished
+    API->>U: WebSocket Push: "Testing Complete"
+    end

@@ -1,0 +1,77 @@
+graph LR
+    %% Styles to match the reference image palette
+    classDef orchestration fill:#f5deb3,stroke:#d2b48c,stroke-width:2px,color:black;
+    classDef appLandscape fill:#add8e6,stroke:#87ceeb,stroke-width:2px,color:black;
+    classDef dataMgmt fill:#ffdead,stroke:#ffa500,stroke-width:2px,color:black;
+    classDef analytics fill:#d3d3d3,stroke:#a9a9a9,stroke-width:2px,color:black;
+    classDef container fill:#ffffff,stroke:#333333,stroke-width:2px;
+
+    subgraph cmp["cmp Application_Architecture"]
+        direction LR
+
+        %% Zone 1: Presentation & Orchestration (Left)
+        subgraph orch["Orchestration & Access"]
+            direction TB
+            Dashboard["Frontend<br/>Auditor Dashboard"]:::orchestration
+            API["API Gateway<br/>& Session Mgr"]:::orchestration
+            Engine["Orchestration Engine<br/>(LangGraph4j Runtime)"]:::orchestration
+        end
+
+        %% Zone 2: The Agent Application Landscape (Center)
+        subgraph agent["Agent Landscape"]
+            direction TB
+            
+            subgraph ctw["Control Testing Workflow"]
+                Planner["Planner Agent<br/>(Strategy & Schema)"]:::appLandscape
+                Reviewer["Reviewer Agent<br/>(Critique & Methodology)"]:::appLandscape
+                Executor["Executor Agent<br/>(Tool Execution)"]:::appLandscape
+            end
+            
+            PromptSvc["Prompt Service<br/>(Template Registry)"]:::appLandscape
+        end
+
+        %% Zone 3: Integration & Intelligence (Right-Center)
+        subgraph ii["Integration & Intelligence"]
+            direction TB
+            LLM_Gate["Authenticated<br/>LLM Gateway"]:::dataMgmt
+            MCP_Gate["MCP Client<br/>Manager"]:::dataMgmt
+            
+            subgraph extTools["External Tools"]
+                Ext_AB["AuditBoard<br/>MCP Server"]:::analytics
+                Ext_SQL["Data Lake<br/>MCP Server"]:::analytics
+            end
+        end
+
+        %% Zone 4: Data Management (Right)
+        subgraph dm["Data Management"]
+            direction TB
+            StateDB["Workflow State DB<br/>(PostgreSQL JSONB)"]:::dataMgmt
+            VectorDB["Knowledge Base<br/>(pgvector / RAG)"]:::dataMgmt
+        end
+
+        %% Connections
+        Dashboard -- "1. Trigger Test" --> API
+        API -- "2. Init Workflow" --> Engine
+        
+        Engine -- "3. Coordinate" --> Planner
+        Engine -- "State Cycle" --> Reviewer
+        Engine -- "Resume" --> Executor
+        
+        %% Agent Dependencies
+        Planner & Reviewer & Executor -. "Fetch Prompts" .-> PromptSvc
+        Planner & Executor -- "Reasoning" --> LLM_Gate
+        Planner & Executor -- "Data Access" --> MCP_Gate
+        
+        %% External & Data flows
+        MCP_Gate -- "JSON-RPC" --> Ext_AB
+        MCP_Gate -- "JDBC" --> Ext_SQL
+        
+        Engine -- "Persist State" --> StateDB
+        Planner -- "Context Lookup" --> VectorDB
+    end
+
+    %% Apply Styles to Subgraphs
+    style orch fill:#e6e6e6,stroke:#999,stroke-dasharray: 5 5
+    style agent fill:#e6f2ff,stroke:#999,stroke-dasharray: 5 5
+    style ii fill:#fff5e6,stroke:#999,stroke-dasharray: 5 5
+    style dm fill:#f0f0f0,stroke:#999,stroke-dasharray: 5 5

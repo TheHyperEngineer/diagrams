@@ -1,0 +1,67 @@
+classDiagram
+    %% Core Interfaces
+    class WorkflowDefinition {
+        <<Interface>>
+        +String getProcessKey()
+        +StateGraph buildGraph()
+    }
+
+    class AgentStep {
+        <<Abstract>>
+        #MCPClient mcpClient
+        #LLMGateway llmGateway
+        #PromptService promptService
+        +State execute(State currentState)
+        #abstract PromptTemplate getSystemPrompt()
+    }
+
+    %% Concrete Implementations
+    class ControlTestWorkflow {
+        +buildGraph() StateGraph
+    }
+    
+    class PlannerAgent {
+        +execute(State s)
+        -validateSchema(Plan p)
+    }
+
+    class ExecutorAgent {
+        +execute(State s)
+        -loopThroughPlan(Plan p)
+    }
+
+    class ReviewerAgent {
+        +execute(State s)
+        -calculateConfidence(Result r)
+    }
+
+    %% Services
+    class StateRepository {
+        +save(UUID id, State s)
+        +load(UUID id)
+    }
+
+    class MCPClientManager {
+        +listTools()
+        +executeTool(String name, Map args)
+    }
+
+    class AuthenticatedLLMGateway {
+        +generate(Prompt p, Context c)
+        -maskPII(String input)
+        -enrichContext(String prompt)
+    }
+
+    %% Relationships
+    WorkflowDefinition <|-- ControlTestWorkflow
+    ControlTestWorkflow ..> PlannerAgent : orchestrates
+    ControlTestWorkflow ..> ExecutorAgent : orchestrates
+    ControlTestWorkflow ..> ReviewerAgent : orchestrates
+    
+    AgentStep <|-- PlannerAgent
+    AgentStep <|-- ExecutorAgent
+    AgentStep <|-- ReviewerAgent
+    
+    AgentStep --> MCPClientManager : uses
+    AgentStep --> AuthenticatedLLMGateway : uses
+    AgentStep --> StateRepository : persists

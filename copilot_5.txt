@@ -1,0 +1,23 @@
+sequenceDiagram
+    autonumber
+    participant Auditor as Auditor (Browser)
+    participant API as Copilot Controller
+    participant Context as Context Service
+    participant Vector as PgVector (RAG)
+    participant LLM as Model Gateway
+    
+    Auditor->>API: POST /assist/draft (FindingData, TemplateType)
+    API->>Context: Hydrate Context (Methodology, Rules for TemplateType)
+    Context-->>API: System Prompt + Constraints
+    
+    API->>Vector: Similarity Search (FindingData.ControlDescription)
+    Vector-->>API: Relevant Past Findings / Standards
+    
+    API->>LLM: Stream Completion (System Prompt + Context + User Data)
+    
+    loop Server-Sent Events (SSE)
+        LLM-->>API: Token Chunk
+        API-->>Auditor: Stream Token
+    end
+    
+    API-->>Auditor: [DONE] Event + Usage Metrics
